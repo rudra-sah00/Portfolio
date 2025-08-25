@@ -31,10 +31,12 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ repositories, loading }) => {
               )}
             </div>
             <div className="tabs_line"></div>
-            <p className="text-size-small text-color-gray400">
+            <p className={`text-size-small text-color-gray400 ${styles.hideOnMobile}`}>
               {repo.description || 'No description available for this repository.'}
             </p>
-            <TechStack languages={repo.languages || {}} />
+            <div className={styles.hideOnMobile}>
+              <TechStack languages={repo.languages || {}} />
+            </div>
           </div>
         ))
       )}
