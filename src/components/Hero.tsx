@@ -44,8 +44,10 @@ const Hero = () => {
 
   const handleTerminalClose = () => {
     setIsTerminalOpen(false);
-    // Restore scrolling when terminal is closed
-    document.body.style.overflow = 'unset';
+    // Only restore scrolling if not overridden by other components
+    if (document.body.style.overflow === 'hidden') {
+      document.body.style.overflow = 'unset';
+    }
   };
 
   return (
