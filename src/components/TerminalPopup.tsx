@@ -19,6 +19,69 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalBodyRef = useRef<HTMLDivElement>(null);
 
+  // Function to format terminal text with proper styling
+  const formatTerminalText = (text: string) => {
+    if (text.startsWith('🤖 Rudra-B:')) {
+      // Remove the prefix for processing
+      const content = text.replace('🤖 Rudra-B: ', '');
+      
+      // Process the content for better formatting
+      let formattedContent = content;
+      
+      // Handle bullet points
+      formattedContent = formattedContent.replace(/•\s/g, '  • ');
+      
+      // Split the text into lines for better processing
+      const lines = formattedContent.split('\n');
+      const processedLines = lines.map((line, lineIndex) => {
+        // Split each line into parts for bold formatting
+        const parts = line.split(/(\*\*[^*]+\*\*)/g);
+        
+        return (
+          <div key={lineIndex} className={lineIndex > 0 ? 'mt-1' : ''}>
+            {parts.map((part, partIndex) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                // Bold text - technical terms and important words
+                const boldText = part.slice(2, -2);
+                return (
+                  <span key={partIndex} className="text-green-400 font-bold">
+                    {boldText}
+                  </span>
+                );
+              } else if (part.includes('•')) {
+                // Bullet points
+                return (
+                  <span key={partIndex} className="text-blue-300">
+                    {part}
+                  </span>
+                );
+              } else {
+                // Regular text
+                return (
+                  <span key={partIndex} className="text-gray-200">
+                    {part}
+                  </span>
+                );
+              }
+            })}
+          </div>
+        );
+      });
+      
+      return (
+        <div>
+          <span className="text-cyan-400 font-bold">🤖 Rudra-B: </span>
+          <div className="mt-1 leading-relaxed">
+            {processedLines}
+          </div>
+        </div>
+      );
+    }
+    
+    // Return regular text for non-AI responses
+    return <span>{text}</span>;
+  };
+
   const executeCommand = async (command: string) => {
     if (command.trim()) {
       setCommandHistory(prev => [...prev, command]);
@@ -55,12 +118,22 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
           ''
         ]);
         
+        // Scroll to bottom after adding response
+        setTimeout(() => {
+          if (terminalBodyRef.current) {
+            terminalBodyRef.current.scrollTo({
+              top: terminalBodyRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+        
         // Restore focus to input after response
         setTimeout(() => {
           if (inputRef.current) {
             inputRef.current.focus();
           }
-        }, 100);
+        }, 200);
       } catch {
         setIsTyping(false);
         setHistory(prev => [
@@ -69,12 +142,22 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
           ''
         ]);
         
+        // Scroll to bottom after error
+        setTimeout(() => {
+          if (terminalBodyRef.current) {
+            terminalBodyRef.current.scrollTo({
+              top: terminalBodyRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+        
         // Restore focus to input after error
         setTimeout(() => {
           if (inputRef.current) {
             inputRef.current.focus();
           }
-        }, 100);
+        }, 200);
       }
     } else {
       // Handle regular commands
@@ -381,16 +464,111 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
     if (isOpen) {
       // Store the original overflow style
       const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const originalWidth = document.body.style.width;
       
-      // Disable scrolling on the body
+      // Get current scroll position
+      const scrollY = window.scrollY;
+      
+      // Disable scrolling on the body with multiple methods
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       
-      // Cleanup function to restore scrolling when terminal closes
+      // Prevent mobile zoom on input focus
+      const viewport = document.querySelector('meta[name=viewport]');
+      const originalViewport = viewport?.getAttribute('content');
+      
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      }
+      
+      // Add touch event listeners to prevent scrolling - but be more selective
+      const preventTouchMove = (e: TouchEvent) => {
+        // Only prevent if the target is the backdrop or body
+        const target = e.target as Element;
+        
+        // Allow all events within the terminal component tree
+        if (target.closest('.terminal-container')) {
+          return;
+        }
+        
+        // Prevent only on backdrop
+        if (target.classList.contains('terminal-backdrop') || target === document.body) {
+          e.preventDefault();
+        }
+      };
+      
+      const preventWheel = (e: WheelEvent) => {
+        // Only prevent wheel events on the backdrop
+        const target = e.target as Element;
+        
+        // Allow all events within the terminal component tree
+        if (target.closest('.terminal-container')) {
+          return;
+        }
+        
+        // Prevent only on backdrop
+        if (target.classList.contains('terminal-backdrop') || target === document.body) {
+          e.preventDefault();
+        }
+      };
+      
+      // Add event listeners with passive: false only where needed
+      document.addEventListener('touchmove', preventTouchMove, { passive: false });
+      document.addEventListener('wheel', preventWheel, { passive: false });
+      
+      // Cleanup function to restore scrolling and viewport when terminal closes
       return () => {
+        // Restore body styles
         document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = originalWidth;
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+        
+        // Restore viewport
+        if (viewport && originalViewport) {
+          viewport.setAttribute('content', originalViewport);
+        }
+        
+        // Remove event listeners
+        document.removeEventListener('touchmove', preventTouchMove);
+        document.removeEventListener('wheel', preventWheel);
       };
     }
   }, [isOpen]);
+
+  // Auto-scroll to bottom when history updates
+  useEffect(() => {
+    if (terminalBodyRef.current) {
+      const scrollToBottom = () => {
+        terminalBodyRef.current!.scrollTop = terminalBodyRef.current!.scrollHeight;
+      };
+      
+      // Use requestAnimationFrame for smooth scrolling
+      requestAnimationFrame(scrollToBottom);
+    }
+  }, [history, isTyping]);
+
+  // Smooth scroll to bottom when typing state changes
+  useEffect(() => {
+    if (terminalBodyRef.current && isTyping) {
+      const scrollToBottom = () => {
+        terminalBodyRef.current!.scrollTo({
+          top: terminalBodyRef.current!.scrollHeight,
+          behavior: 'smooth'
+        });
+      };
+      
+      // Small delay to ensure content is rendered
+      setTimeout(scrollToBottom, 50);
+    }
+  }, [isTyping]);
 
   if (!isOpen) return null;
 
@@ -398,10 +576,14 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
   const promptColor = terminalEngine.getPromptColor();
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className={`bg-black rounded-lg shadow-2xl w-full max-w-4xl transition-all duration-300 flex flex-col ${
-        isMinimized ? 'h-12' : 'h-[70vh]'
-      }`}>
+    <div 
+      className="terminal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    >
+      <div 
+        className={`terminal-container bg-black rounded-lg shadow-2xl w-full max-w-4xl transition-all duration-300 flex flex-col ${
+          isMinimized ? 'h-12' : 'h-[70vh]'
+        }`}
+      >
         {/* Terminal Header - Mac Style */}
         <div className="flex items-center justify-between bg-black px-4 py-3 rounded-t-lg">
           <div className="flex items-center space-x-2">
@@ -439,6 +621,11 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
                 <div key={index} className="whitespace-pre-wrap">
                   {line.includes('<span') ? (
                     <div dangerouslySetInnerHTML={{ __html: line }} />
+                  ) : line.startsWith('🤖 Rudra-B:') ? (
+                    // Special formatting for AI responses
+                    <div className="my-2">
+                      {formatTerminalText(line)}
+                    </div>
                   ) : (
                     <span className={line.startsWith('Error:') ? 'text-red-400' : 
                                    line.startsWith('👋') ? 'text-yellow-300' :
@@ -471,10 +658,17 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
                     value={currentInput}
                     onChange={(e) => setCurrentInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="flex-1 bg-transparent text-white outline-none border-none"
-                    style={{ caretColor: 'white' }}
+                    className="flex-1 bg-transparent text-white outline-none border-none text-base"
+                    style={{ 
+                      caretColor: 'white',
+                      fontSize: '16px', // Prevents zoom on iOS
+                      WebkitAppearance: 'none',
+                      borderRadius: 0
+                    }}
                     autoComplete="off"
                     spellCheck={false}
+                    autoCapitalize="off"
+                    autoCorrect="off"
                   />
                 </div>
               )}
