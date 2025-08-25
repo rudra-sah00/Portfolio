@@ -1,0 +1,198 @@
+/* README Viewer Component Styles */
+.readmeViewer {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	background: var(--gray-900);
+	border-bottom: 1px solid var(--gray-700);
+	border-radius: var(--border-radius--medium) var(--border-radius--medium) 0 0;
+}
+
+.icon {
+	color: var(--gray-400);
+}
+
+.title {
+	color: var(--gray-100);
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 1.5rem;
+	background: var(--gray-900);
+	border-radius: 0 0 var(--border-radius--medium) var(--border-radius--medium);
+}
+
+/* Mermaid Diagram Styles */
+.mermaidDiagram {
+	margin: 1rem 0;
+	padding: 1rem;
+	background: var(--gray-800);
+	border-radius: var(--border-radius--small);
+	border: 1px solid var(--gray-700);
+	text-align: center;
+}
+
+.mermaidDiagram :global(svg) {
+	max-width: 100%;
+	height: auto;
+}
+
+/* README Typography */
+.content :global(h1) {
+	color: var(--gray-100);
+	font-size: 2rem;
+	font-weight: 600;
+	margin: 0 0 1rem 0;
+	border-bottom: 1px solid var(--gray-700);
+	padding-bottom: 0.5rem;
+}
+
+.content :global(h2) {
+	color: var(--gray-100);
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin: 1.5rem 0 1rem 0;
+	border-bottom: 1px solid var(--gray-800);
+	padding-bottom: 0.25rem;
+}
+
+.content :global(h3) {
+	color: var(--gray-100);
+	font-size: 1.25rem;
+	font-weight: 600;
+	margin: 1.25rem 0 0.75rem 0;
+}
+
+.content :global(h4) {
+	color: var(--gray-200);
+	font-size: 1.1rem;
+	font-weight: 600;
+	margin: 1rem 0 0.5rem 0;
+}
+
+.content :global(h5) {
+	color: var(--gray-200);
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0.875rem 0 0.5rem 0;
+}
+
+.content :global(h6) {
+	color: var(--gray-300);
+	font-size: 0.875rem;
+	font-weight: 600;
+	margin: 0.75rem 0 0.5rem 0;
+}
+
+.content :global(p) {
+	color: var(--gray-200);
+	line-height: 1.6;
+	margin: 0.75rem 0;
+}
+
+.content :global(code) {
+	background: var(--gray-800);
+	color: var(--green);
+	padding: 0.125rem 0.25rem;
+	border-radius: 3px;
+	font-family: 'Courier New', monospace;
+	font-size: 0.875em;
+}
+
+.content :global(pre) {
+	background: var(--gray-800);
+	border: 1px solid var(--gray-700);
+	border-radius: var(--border-radius--small);
+	padding: 1rem;
+	margin: 1rem 0;
+	overflow-x: auto;
+}
+
+.content :global(pre code) {
+	font-family: 'Courier New', monospace;
+	font-size: 0.875rem;
+	line-height: 1.45;
+	color: var(--gray-100);
+	background: transparent;
+	padding: 0;
+}
+
+.content :global(blockquote) {
+	border-left: 4px solid var(--green);
+	padding-left: 1rem;
+	margin: 1rem 0;
+	color: var(--gray-300);
+	font-style: italic;
+}
+
+.content :global(ul),
+.content :global(ol) {
+	margin: 0.75rem 0;
+	padding-left: 1.5rem;
+}
+
+.content :global(li) {
+	color: var(--gray-200);
+	margin: 0.25rem 0;
+	line-height: 1.6;
+}
+
+.content :global(a) {
+	color: var(--green);
+	text-decoration: underline;
+	transition: color 0.2s ease;
+}
+
+.content :global(a:hover) {
+	color: var(--dark-green);
+}
+
+.content :global(img) {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--border-radius--small);
+	margin: 1rem 0;
+}
+
+.content :global(table) {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1rem 0;
+	background: var(--gray-800);
+	border-radius: var(--border-radius--small);
+	overflow: hidden;
+}
+
+.content :global(thead) {
+	background: var(--gray-700);
+}
+
+.content :global(th) {
+	color: var(--gray-100);
+	font-weight: 600;
+	padding: 0.75rem;
+	text-align: left;
+	border-bottom: 1px solid var(--gray-600);
+}
+
+.content :global(td) {
+	color: var(--gray-200);
+	padding: 0.75rem;
+	border-bottom: 1px solid var(--gray-700);
+}
+
+.content :global(tr:last-child td) {
+	border-bottom: none;
+}
