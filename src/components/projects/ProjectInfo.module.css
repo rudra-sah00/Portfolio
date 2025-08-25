@@ -7,10 +7,9 @@
 }
 
 .organization-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   padding: 0.5rem 0.875rem;
   background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
   border: 1px solid var(--color-primary-500);
@@ -32,18 +31,24 @@
   background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
 }
 
-.org-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--gray-100);
-  opacity: 1;
-  flex-shrink: 0;
+.iconWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
-.org-name {
+.orgIcon {
+  width: 14px;
+  height: 14px;
+  color: var(--gray-100);
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+.orgName {
   color: var(--gray-100);
   font-weight: 600;
   font-size: 0.75rem;
@@ -69,12 +74,17 @@
     min-height: 1.75rem;
   }
   
-  .org-icon {
+  .iconWrapper {
     width: 14px;
     height: 14px;
   }
   
-  .org-name {
+  .orgIcon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .orgName {
     font-size: 0.7rem;
   }
 }

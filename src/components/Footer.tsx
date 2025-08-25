@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from 'react';
-import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Github, Linkedin, Instagram, Mail } from 'lucide-react';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import styles from './Footer.module.css';
 
@@ -9,10 +9,10 @@ export default function Footer() {
   const ref = useRef(null);
 
   const socialLinks = [
-    { title: 'GitHub', icon: <Github size={20} />, href: 'https://github.com/rudra' },
-    { title: 'LinkedIn', icon: <Linkedin size={20} />, href: 'https://linkedin.com/in/rudra' },
-    { title: 'Twitter', icon: <Twitter size={20} />, href: 'https://twitter.com/rudra' },
-    { title: 'Email', icon: <Mail size={20} />, href: 'mailto:rudra@example.com' },
+    { title: 'GitHub', icon: <Github size={20} />, href: 'https://github.com/rudra-sah00' },
+    { title: 'LinkedIn', icon: <Linkedin size={20} />, href: 'https://www.linkedin.com/in/rudra-narayana-sahoo-695342288/' },
+    { title: 'Instagram', icon: <Instagram size={20} />, href: 'https://www.instagram.com/rudra.sah00/' },
+    { title: 'Email', icon: <Mail size={20} />, href: 'mailto:rudranarayanaknr@gmail.com' },
   ];
 
   return (
@@ -33,7 +33,7 @@ export default function Footer() {
                 />
               </div>
               <p className={styles.getInTouchEmail}>
-                hello@rudrasahoo.me
+                rudranarayanaknr@gmail.com
               </p>
             </div>
           </div>
