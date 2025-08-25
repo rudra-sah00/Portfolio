@@ -207,18 +207,18 @@ Contact form emails are configured to work out of the box.
 ### Repository Showcase
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant API as API Route
-    participant GH as GitHub API
+    participant Client
+    participant API
+    participant GitHub
     
-    C->>API: Request repositories
-    API->>GH: Fetch user repos
-    API->>GH: Fetch org repos
-    API->>GH: Fetch README content
-    API->>GH: Fetch language stats
-    API->>C: Return processed data
+    Client->>API: Request repositories
+    API->>GitHub: Fetch user repos
+    API->>GitHub: Fetch org repos
+    API->>GitHub: Fetch README content
+    API->>GitHub: Fetch language stats
+    API->>Client: Return processed data
     
-    Note over C: Render with animations
+    Note over Client: Render with animations
 ```
 
 ### Tech Stack Visualization
