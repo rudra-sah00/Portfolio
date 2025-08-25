@@ -18,7 +18,7 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ repositories, loading }) => {
           </h2>
         </div>
       ) : (
-        repositories.map((repo, index) => (
+        repositories.map((repo) => (
           <div key={repo.id} className="tabs_let-content">
             <div className={styles.projectHeader}>
               <h2 className="heading-style-h4 text-color-gray100">

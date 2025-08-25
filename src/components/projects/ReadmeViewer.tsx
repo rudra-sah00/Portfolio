@@ -45,7 +45,7 @@ interface ReadmeViewerProps {
   repoName: string;
 }
 
-const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content, repoName }) => {
+const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content }) => {
   return (
     <div className={styles.readmeViewer}>
       <div className={styles.header}>
@@ -59,8 +59,12 @@ const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content, repoName }) => {
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSanitize]}
           components={{
-            // Handle code blocks with Mermaid support
-            code: ({ node, inline, className, children, ...props }: any) => {
+                        // Handle code blocks with Mermaid support
+            code: (props: React.ComponentProps<'code'> & { 
+              node?: unknown; 
+              inline?: boolean; 
+            }) => {
+              const { node, inline, className, children, ...restProps } = props;
               const match = /language-(\w+)/.exec(className || '');
               const language = match ? match[1] : '';
               
@@ -69,20 +73,20 @@ const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content, repoName }) => {
               }
               
               return (
-                <code className={className} {...props}>
+                <code className={className} {...restProps}>
                   {children}
                 </code>
               );
             },
             // Handle div elements
-            div: ({ children, ...props }: any) => {
-              const { align, ...restProps } = props;
+            div: (props: React.ComponentProps<'div'> & { align?: string }) => {
+              const { align, children, ...restProps } = props;
               return (
                 <div 
                   {...restProps} 
                   style={{ 
-                    textAlign: align,
-                    ...props.style 
+                    textAlign: align as React.CSSProperties['textAlign'],
+                    ...restProps.style 
                   }}
                 >
                   {children}
@@ -90,33 +94,36 @@ const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content, repoName }) => {
               );
             },
             // Handle img elements
-            img: ({ src, alt, width, height, ...props }: any) => (
-              <img 
-                src={src} 
-                alt={alt}
-                style={{
-                  width: width ? `${width}px` : undefined,
-                  maxWidth: '100%',
-                  height: 'auto'
-                }}
-                {...props}
-              />
-            ),
+            img: (props: React.ComponentProps<'img'> & { width?: string | number }) => {
+              const { src, alt, width, ...restProps } = props;
+              return (
+                <img 
+                  src={src} 
+                  alt={alt}
+                  style={{
+                    width: width ? `${width}px` : undefined,
+                    maxWidth: '100%',
+                    height: 'auto'
+                  }}
+                  {...restProps}
+                />
+              );
+            },
             // Handle table elements
-            table: ({ children, ...props }: any) => (
+            table: (props: React.ComponentProps<'table'>) => (
               <table {...props} style={{ width: '100%', borderCollapse: 'collapse' }}>
-                {children}
+                {props.children}
               </table>
             ),
             // Handle td/th elements  
-            td: ({ children, ...props }: any) => {
-              const { align, vAlign, ...restProps } = props;
+            td: (props: React.ComponentProps<'td'> & { align?: string; vAlign?: string }) => {
+              const { align, vAlign, children, ...restProps } = props;
               return (
                 <td 
                   {...restProps}
                   style={{
-                    textAlign: align,
-                    verticalAlign: vAlign,
+                    textAlign: align as React.CSSProperties['textAlign'],
+                    verticalAlign: vAlign as React.CSSProperties['verticalAlign'],
                     padding: '8px',
                     border: '1px solid var(--gray-700)'
                   }}
@@ -125,14 +132,14 @@ const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content, repoName }) => {
                 </td>
               );
             },
-            th: ({ children, ...props }: any) => {
-              const { align, vAlign, ...restProps } = props;
+            th: (props: React.ComponentProps<'th'> & { align?: string; vAlign?: string }) => {
+              const { align, vAlign, children, ...restProps } = props;
               return (
                 <th 
                   {...restProps}
                   style={{
-                    textAlign: align,
-                    verticalAlign: vAlign,
+                    textAlign: align as React.CSSProperties['textAlign'],
+                    verticalAlign: vAlign as React.CSSProperties['verticalAlign'],
                     padding: '8px',
                     border: '1px solid var(--gray-700)',
                     backgroundColor: 'var(--gray-800)'

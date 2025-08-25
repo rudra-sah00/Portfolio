@@ -61,7 +61,7 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
             inputRef.current.focus();
           }
         }, 100);
-      } catch (error) {
+      } catch {
         setIsTyping(false);
         setHistory(prev => [
           ...prev,
@@ -288,7 +288,7 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
             setTimeout(updateSubmissionProgress, 800);
           }
         }
-      } catch (error) {
+      } catch {
         setHistory(prev => [
           ...prev,
           'Error: Command execution failed',
@@ -394,7 +394,6 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
 
   if (!isOpen) return null;
 
-  const currentState = terminalEngine.getState();
   const prompt = terminalEngine.getPrompt();
   const promptColor = terminalEngine.getPromptColor();
 

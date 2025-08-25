@@ -17,7 +17,7 @@ const ReadmeSection: React.FC<ReadmeSectionProps> = ({ repositories, loading }) 
           </div>
         </div>
       ) : (
-        repositories.map((repo, index) => (
+        repositories.map((repo) => (
           <div key={`readme-${repo.id}`} className="tabs_video readme-content">
             <ReadmeViewer 
               content={repo.readme_content || '# No README available'} 

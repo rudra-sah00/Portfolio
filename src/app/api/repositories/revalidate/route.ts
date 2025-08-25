@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     // Revalidate the repositories data
     revalidatePath('/api/repositories');

@@ -60,14 +60,14 @@ const Hero = () => {
                   {/* Main Heading - Single Line */}
                   <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-light tracking-tight whitespace-nowrap px-4">
                     <span className="font-thin italic text-gray-600">Hey,</span>{" "}
-                    <span className="font-bold italic text-gray-800">I'm</span>{" "}
+                    <span className="font-bold italic text-gray-800">I&apos;m</span>{" "}
                     <span className="font-black italic bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent pr-3">Rudra</span>
                     <span className="text-teal-500 font-bold italic">.</span>
                   </h1>
                   
                   {/* Subtitle with animated text - Single line */}
                   <div className="flex items-center justify-center gap-3 text-xl sm:text-2xl lg:text-3xl text-gray-700 px-4">
-                    <span className="font-semibold italic pr-2">I'm a</span>
+                    <span className="font-semibold italic pr-2">I&apos;m a</span>
                     <ContainerTextFlip
                       words={[
                         "Tech Enthusiast",

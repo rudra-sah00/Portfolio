@@ -6,12 +6,12 @@ export const useScrollAnimation = (repositories: GitHubRepo[]) => {
     const handleScroll = () => {
       if (repositories.length === 0) return;
 
-      let scrollPosition = window.scrollY;
+      const scrollPosition = window.scrollY;
       // Calculate window height based on number of repositories for smooth transitions
-      let windowHeight = window.innerHeight + (repositories.length > 5 ? 400 : 550);
-      let sections = document.querySelectorAll('.tabs_let-content');
-      let readmeContents = document.querySelectorAll('.readme-content');
-      let lastSectionIndex = sections.length - 1;
+      const windowHeight = window.innerHeight + (repositories.length > 5 ? 400 : 550);
+      const sections = document.querySelectorAll('.tabs_let-content');
+      const readmeContents = document.querySelectorAll('.readme-content');
+      const lastSectionIndex = sections.length - 1;
       let currentActiveIndex = 0;
 
       sections.forEach((section, index) => {

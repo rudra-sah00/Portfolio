@@ -48,11 +48,11 @@ export async function GET(request: Request) {
       { headers }
     );
 
-    let orgRepos: any[] = [];
+    let orgRepos: GitHubRepo[] = [];
     if (orgReposResponse.ok) {
       const allUserRepos = await orgReposResponse.json();
       // Filter only organization repositories
-      orgRepos = allUserRepos.filter((repo: any) => repo.owner.type === 'Organization');
+      orgRepos = allUserRepos.filter((repo: GitHubRepo) => repo.owner?.type === 'Organization');
     }
 
     // Combine user repos and organization repos
@@ -65,8 +65,13 @@ export async function GET(request: Request) {
 
     // Fetch README and languages for each repository
     const reposWithReadme = await Promise.all(
-      uniqueRepos.map(async (repo: any): Promise<GitHubRepo> => {
+      uniqueRepos.map(async (repo: GitHubRepo): Promise<GitHubRepo> => {
         try {
+          // Skip repos without owner information
+          if (!repo.owner) {
+            throw new Error('Repository owner information missing');
+          }
+
           // Fetch README - use the correct owner (could be user or organization)
           const readmeResponse = await fetch(
             `https://api.github.com/repos/${repo.owner.login}/${repo.name}/readme`,
@@ -107,11 +112,11 @@ Click "View on GitHub" to explore the repository directly.`;
             html_url: repo.html_url,
             readme_content,
             languages,
-            owner: {
+            owner: repo.owner ? {
               login: repo.owner.login,
               type: repo.owner.type
-            },
-            isOrganizationRepo: repo.owner.type === 'Organization'
+            } : { login: '', type: 'User' },
+            isOrganizationRepo: repo.owner?.type === 'Organization'
           };
         } catch (error) {
           console.error(`Error fetching data for ${repo.name}:`, error);
@@ -129,11 +134,11 @@ Unable to load README for "${repo.name}".
 
 Click "View on GitHub" to explore the repository directly.`,
             languages: {},
-            owner: {
+            owner: repo.owner ? {
               login: repo.owner.login,
               type: repo.owner.type
-            },
-            isOrganizationRepo: repo.owner.type === 'Organization'
+            } : { login: '', type: 'User' },
+            isOrganizationRepo: repo.owner?.type === 'Organization'
           };
         }
       })

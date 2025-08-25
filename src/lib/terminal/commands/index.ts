@@ -1,9 +1,6 @@
 import { Command, CommandResult, TerminalState } from '../types';
 import { getRootState, getUserState, getGeminiChatState } from '../state';
-import { GeminiAPI } from '../chat/gemini';
-import { availableAgents, getAgentById, ChatSession } from '../chat/types';
-
-const geminiAPI = new GeminiAPI('AIzaSyA_dv4JMDA8FWaiiib_lx4Hqrjwe91JbVo');
+import { getAgentById, ChatSession } from '../chat/types';
 
 export const rootCommand: Command = {
   name: 'root',
@@ -67,7 +64,7 @@ export const helpCommand: Command = {
 export const resumeCommand: Command = {
   name: 'resume',
   description: 'Download resume PDF',
-  execute: (args: string[], state: TerminalState): CommandResult => {
+  execute: (): CommandResult => {
     const downloadingAnimation = [
       '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
       '<span class="text-cyan-400">║</span>                    <span class="text-yellow-300 font-bold">RESUME DOWNLOAD</span>                           <span class="text-cyan-400">║</span>',
@@ -95,7 +92,7 @@ export const resumeCommand: Command = {
 export const clearCommand: Command = {
   name: 'clear',
   description: 'Clear terminal screen',
-  execute: (args: string[], state: TerminalState): CommandResult => {
+  execute: (): CommandResult => {
     return {
       output: [],
       clear: true
@@ -106,7 +103,7 @@ export const clearCommand: Command = {
 export const aiChatCommand: Command = {
   name: 'chat',
   description: 'Start chat with Rudra-B',
-  execute: (args: string[], state: TerminalState): CommandResult => {
+  execute: (): CommandResult => {
     const agent = getAgentById('rudra-b');
     
     if (!agent) {

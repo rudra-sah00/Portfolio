@@ -194,7 +194,7 @@ export class TerminalEngine {
     // Check if we're in chat mode and it's not a special command
     if (this.state.chatSession && this.state.chatSession.isActive && 
         !trimmedInput.startsWith('/') && !trimmedInput.startsWith('!') && 
-        commandName !== 'clear') {
+        commandName !== 'clear' && commandName !== 'bye') {
       
       // Handle direct message to AI agent
       if (this.state.chatSession.agent.id === 'rudra-b') {
@@ -220,7 +220,7 @@ export class TerminalEngine {
               `<span class="text-cyan-400">🤖</span> <span class="text-purple-400 font-semibold">Rudra-B:</span> <span class="text-green-300">${response}</span>`
             ]
           };
-        } catch (error) {
+        } catch {
           return {
             output: [
               'Sorry, I encountered an error while processing your request.',
@@ -233,16 +233,28 @@ export class TerminalEngine {
 
     const command = this.commands.get(commandName);
     
-    // If in chat mode, only allow bye command or direct messages
-    if (this.state.chatSession && this.state.chatSession.isActive && commandName !== 'bye') {
-      return {
-        output: [
-          '<span class="text-yellow-400">⚠️  Chat mode is active!</span>',
-          '<span class="text-cyan-300">• Send direct messages to chat with Rudra-B</span>',
-          '<span class="text-cyan-300">• Type <span class="text-red-400">bye</span> to exit chat and use other commands</span>',
-          ''
-        ]
-      };
+    // If in chat mode, check if it's the bye command first
+    if (this.state.chatSession && this.state.chatSession.isActive) {
+      if (commandName === 'bye') {
+        // Execute bye command to exit chat mode
+        if (command) {
+          const result = await command.execute(args, this.state);
+          if (result.newState) {
+            this.state = { ...this.state, ...result.newState };
+          }
+          return result;
+        }
+      } else if (commandName !== 'clear') {
+        // For any other command except clear, show chat mode warning
+        return {
+          output: [
+            '<span class="text-yellow-400">⚠️  Chat mode is active!</span>',
+            '<span class="text-cyan-300">• Send direct messages to chat with Rudra-B</span>',
+            '<span class="text-cyan-300">• Type <span class="text-red-400">bye</span> to exit chat and use other commands</span>',
+            ''
+          ]
+        };
+      }
     }
     
     if (!command) {
