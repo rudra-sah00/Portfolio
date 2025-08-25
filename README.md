@@ -1,61 +1,108 @@
-# 🚀 Modern Portfolio with GitHub Integration
+# 🚀 Modern Portfolio with Advanced Animations & GitHub Integration
 
-A dynamic, responsive portfolio built with **Next.js 15**, **TypeScript**, and **Tailwind CSS** that automatically showcases your GitHub repositories with beautiful animations and interactive features.
+A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, **GSAP animations**, and **Tailwind CSS** that automatically showcases your GitHub repositories with stunning animations and interactive features.
+
+🌐 **Live Website**: [rudrasahoo.live](https://rudrasahoo.live)
 
 ![Portfolio Preview](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.0-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![GSAP](https://img.shields.io/badge/GSAP-3.0-88CE02)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0-38B2AC)
+![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)
 
 ## ✨ Features
 
 ### 🎯 Core Features
-- **GitHub Integration**: Automatically fetches and displays your repositories
-- **Organization Support**: Shows repositories from organizations you're part of
-- **Interactive Terminal**: Built-in terminal with AI chat capabilities
-- **Smooth Animations**: Custom scroll-based animations and transitions
-- **Responsive Design**: Mobile-first approach with beautiful UI
-- **Dark Theme**: Modern dark theme with consistent color palette
+- **GitHub Integration**: Automatically fetches and displays your repositories with real-time data
+- **Organization Support**: Shows repositories from organizations you're part of with custom badges
+- **Interactive Terminal**: Built-in terminal with AI chat capabilities powered by Google Gemini
+- **GSAP Animations**: Professional-grade animations with scroll triggers and smooth transitions
+- **Smooth Scrolling**: Buttery smooth page transitions and element animations
+- **Responsive Design**: Mobile-first approach with pixel-perfect responsive layouts
+- **Dark Theme**: Modern dark theme with consistent color palette and accessibility features
+- **Performance Optimized**: Built with Next.js 15 App Router and optimized for speed
+
+### 🎨 Animation Features
+- **GSAP Timeline Animations**: Complex animation sequences with precise timing
+- **Scroll-Triggered Animations**: Elements animate as they enter the viewport
+- **Floating Dock**: Smooth hover animations for social media links
+- **Text Flip Animations**: Eye-catching text reveal animations
+- **Sparkle Effects**: Interactive sparkle animations on hover
+- **Container Parallax**: Smooth parallax scrolling effects
+- **Stagger Animations**: Coordinated animations across multiple elements
 
 ### 📊 Repository Showcase
 - **README Rendering**: Full GitHub-flavored markdown with syntax highlighting
-- **Mermaid Diagrams**: Supports Mermaid diagrams in README files
-- **Tech Stack Visualization**: Language breakdown with progress bars
-- **Organization Badges**: Visual indicators for organization repositories
-- **Live Links**: Direct links to GitHub repositories
+- **Mermaid Diagrams**: Supports complex Mermaid diagrams in README files
+- **Tech Stack Visualization**: Interactive language breakdown with animated progress bars
+- **Organization Badges**: Clean visual indicators for organization repositories
+- **Live Links**: Direct links to GitHub repositories and live demos
+- **Repository Filtering**: Smart filtering and categorization of projects
+- **Real-time Data**: Fresh repository data fetched from GitHub API
 
-### 🤖 AI Terminal
-- **Gemini Integration**: AI-powered chat assistance
-- **Command System**: Unix-like command interface
-- **Contact Form**: Integrated email functionality
-- **Interactive Experience**: Engaging terminal simulation
+### 🤖 AI Terminal Experience
+- **Gemini Integration**: Advanced AI-powered chat assistance with context awareness
+- **Command System**: Full Unix-like command interface with autocomplete
+- **Contact Form**: Integrated email functionality with form validation
+- **Interactive Shell**: Realistic terminal simulation with command history
+- **Custom Commands**: Extensible command system for portfolio navigation
+- **Chat Mode**: Seamless transition between command and chat modes
 
-## 🏗️ Architecture
+### 🎯 Advanced Customizations
+- **Vercel Analytics**: Real-time website analytics and performance monitoring
+- **Speed Insights**: Page performance tracking and optimization
+- **Custom CSS Variables**: Consistent theming system across all components
+- **Modular Architecture**: Clean, maintainable component structure
+- **TypeScript**: Full type safety and enhanced developer experience
+- **SEO Optimized**: Meta tags, Open Graph, and structured data
+
+## 🏗️ Technical Architecture
+
+Built with modern web technologies and best practices:
 
 ```mermaid
 graph TB
-    A[Next.js App Router] --> B[Server Components]
+    A[Next.js 15 App Router] --> B[Server Components]
     A --> C[Client Components]
+    A --> D[GSAP Animations]
     
-    B --> D[API Routes]
-    D --> E[GitHub API]
-    D --> F[Email Service]
+    B --> E[API Routes]
+    E --> F[GitHub API]
+    E --> G[Email Service]
+    E --> H[Gemini AI]
     
-    C --> G[Terminal Engine]
-    C --> H[Scroll Animations]
-    C --> I[Project Showcase]
+    C --> I[Terminal Engine]
+    C --> J[Scroll Animations]
+    C --> K[Project Showcase]
+    C --> L[Floating Dock UI]
     
-    E --> J[Repository Data]
-    E --> K[README Content]
-    E --> L[Language Stats]
+    D --> M[Timeline Animations]
+    D --> N[Scroll Triggers]
+    D --> O[Interactive Effects]
     
-    F --> M[Contact Form]
-    G --> N[AI Chat (Gemini)]
+    F --> P[Repository Data]
+    F --> Q[README Content]
+    F --> R[Language Stats]
+    F --> S[Organization Info]
+    
+    G --> T[Contact Form]
+    I --> U[AI Chat Mode]
     
     style A fill:#0070f3
-    style E fill:#24292e
-    style N fill:#4285f4
+    style F fill:#24292e
+    style H fill:#4285f4
+    style D fill:#88CE02
 ```
+
+### 🛠️ Tech Stack
+- **Frontend**: Next.js 15, React 18, TypeScript 5
+- **Styling**: Tailwind CSS, CSS Modules, Custom CSS Variables
+- **Animations**: GSAP 3, Framer Motion, CSS Transitions
+- **APIs**: GitHub REST API, Google Gemini AI, Resend Email
+- **Deployment**: Vercel with Edge Functions
+- **Analytics**: Vercel Analytics & Speed Insights
+- **Performance**: Image optimization, Code splitting, Edge caching
 
 ## 🚀 Quick Start
 
@@ -253,14 +300,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Mermaid](https://mermaid.js.org/) - Diagram rendering
 - [Resend](https://resend.com/) - Email service
 
-## 📞 Support
+## 📞 Contact & Links
 
-If you have any questions or need help:
-
-- 📧 Email: [your-email@example.com](mailto:your-email@example.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/rudra-sah00/portfolio/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/rudra-sah00/portfolio/discussions)
+- 🌐 **Live Website**: [rudrasahoo.live](https://rudrasahoo.live)
+- 📧 **Email**: [rudranarayanaknr@gmail.com](mailto:rudranarayanaknr@gmail.com)
+- 💼 **LinkedIn**: [Rudra Sahoo](https://www.linkedin.com/in/rudra-narayan-sahoo-318b5427a/)
+- 🐙 **GitHub**: [@rudra-sah00](https://github.com/rudra-sah00)
+- 📷 **Instagram**: [@rudra_sah_00](https://instagram.com/rudra_sah_00)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/rudra-sah00/portfolio/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/rudra-sah00/portfolio/discussions)
 
 ---
 
-**Made with ❤️ using Next.js and TypeScript**
+**Made with ❤️ using Next.js 15, TypeScript, GSAP & Modern Web Technologies**
+
+🚀 **Live at**: [rudrasahoo.live](https://rudrasahoo.live)

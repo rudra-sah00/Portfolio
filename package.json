@@ -1,6 +1,25 @@
 {
   "name": "portfolio",
   "version": "0.1.0",
+  "description": "Modern portfolio website with GSAP animations, GitHub integration, AI terminal, and advanced customizations built with Next.js 15, TypeScript, and Tailwind CSS. Live at rudrasahoo.live",
+  "author": "Rudra Sahoo <rudranarayanaknr@gmail.com>",
+  "homepage": "https://rudrasahoo.live",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rudra-sah00/portfolio.git"
+  },
+  "keywords": [
+    "portfolio",
+    "nextjs",
+    "typescript",
+    "gsap",
+    "animations",
+    "github-api",
+    "ai-terminal",
+    "responsive",
+    "modern",
+    "vercel"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
