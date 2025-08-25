@@ -105,16 +105,7 @@
   width: 100%;
   transform: scaleX(1.2);
   transform-origin: center;
-  background: linear-gradient(135deg, 
-    #2d3748 0%, 
-    #4a5568 25%, 
-    #61ffc9 50%, 
-    #4a5568 75%, 
-    #2d3748 100%);
-  background-size: 200% 200%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #6b7280;
 }
 
 /* Responsive Design */

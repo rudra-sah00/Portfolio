@@ -42,7 +42,7 @@ export const useScrollAnimation = (repositories: GitHubRepo[]) => {
       }
 
       // Update the GitHub button link
-      const githubButton = document.querySelector('.button.is-green.is-secondary') as HTMLAnchorElement;
+      const githubButton = document.querySelector('.button.is-grey.is-secondary') as HTMLAnchorElement;
       if (githubButton && repositories[currentActiveIndex]) {
         githubButton.href = repositories[currentActiveIndex].html_url;
       }

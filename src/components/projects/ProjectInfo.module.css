@@ -46,6 +46,11 @@
   .orgName {
     font-size: 0.7rem;
   }
+
+  /* Hide description and tech stack on mobile */
+  .hideOnMobile {
+    display: none;
+  }
 }
 
 /* Animation for organization badge */
