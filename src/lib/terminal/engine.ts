@@ -227,7 +227,7 @@ export class TerminalEngine {
           
           return {
             output: [
-              `<span class="text-cyan-400">🤖</span> <span class="text-purple-400 font-semibold">Rudra-B:</span> <span class="text-green-300">${response}</span>`
+              `🤖 Rudra-B: ${response}`
             ]
           };
         } catch {
