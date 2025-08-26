@@ -1,6 +1,7 @@
 import { Command, CommandResult, TerminalState } from '../types';
 import { getRootState, getUserState, getGeminiChatState } from '../state';
 import { getAgentById, ChatSession } from '../chat/types';
+import { GitHubRepo } from '../../../types';
 
 export const rootCommand: Command = {
   name: 'root',
@@ -31,6 +32,7 @@ export const helpCommand: Command = {
       '<span class="text-cyan-400 font-bold">Available commands:</span>',
       '',
       '  <span class="text-yellow-300">!help</span>     - <span class="text-gray-300">Show this help message</span>',
+      '  <span class="text-yellow-300">projects</span>  - <span class="text-gray-300">List all GitHub projects</span>',
       '  <span class="text-yellow-300">resume</span>    - <span class="text-gray-300">Download resume PDF</span>',
       '  <span class="text-yellow-300">chat</span>      - <span class="text-gray-300">Start chat with Rudra-B</span>',
       '  <span class="text-yellow-300">contact</span>   - <span class="text-gray-300">Contact form to reach out</span>',
@@ -310,6 +312,53 @@ export const scheduleCommand: Command = {
         '<span class="text-yellow-200">  • Availability checker</span>',
         '',
         '<span class="text-gray-400">Stay tuned for updates...</span>',
+        ''
+      ]
+    };
+  }
+};
+
+export const projectsCommand: Command = {
+  name: 'projects',
+  description: 'List all GitHub projects',
+  execute: (args: string[], state: TerminalState, repositories?: GitHubRepo[]): CommandResult => {
+    if (!repositories || repositories.length === 0) {
+      return {
+        output: [
+          '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
+          '<span class="text-cyan-400">║</span>                      <span class="text-yellow-300 font-bold">MY PROJECTS</span>                             <span class="text-cyan-400">║</span>',
+          '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
+          '',
+          '<span class="text-orange-300">🔄 Loading projects from GitHub...</span>',
+          '<span class="text-gray-400">Please wait while repositories are being fetched.</span>',
+          ''
+        ]
+      };
+    }
+
+    const projectsList = repositories.map((repo, index) => {
+      const languages = repo.languages ? Object.keys(repo.languages).slice(0, 3).join(', ') : 'N/A';
+      const description = repo.description || 'No description available';
+      
+      return [
+        `<span class="text-green-400">${index + 1}. ${repo.name}</span>`,
+        `   <span class="text-gray-300">${description}</span>`,
+        `   <span class="text-blue-300">Languages:</span> <span class="text-yellow-200">${languages}</span>`,
+        `   <span class="text-blue-300">GitHub:</span> <span class="text-purple-300">${repo.html_url}</span>`,
+        ''
+      ];
+    }).flat();
+
+    return {
+      output: [
+        '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
+        '<span class="text-cyan-400">║</span>                      <span class="text-yellow-300 font-bold">MY PROJECTS</span>                             <span class="text-cyan-400">║</span>',
+        '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
+        '',
+        `<span class="text-green-300">📊 Found ${repositories.length} repositories:</span>`,
+        '',
+        ...projectsList,
+        '<span class="text-gray-400">💡 Ask Rudra-B about any specific project by typing "!chat" first!</span>',
         ''
       ]
     };

@@ -8,6 +8,8 @@ export interface GeminiResponse {
   }>;
 }
 
+import { GitHubRepo } from '@/types';
+
 export class GeminiAPI {
   private apiKey: string;
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
@@ -16,7 +18,102 @@ export class GeminiAPI {
     this.apiKey = apiKey;
   }
 
-  async generateResponse(message: string): Promise<string> {
+  private generateProjectsSection(repositories: GitHubRepo[]): string {
+    if (!repositories || repositories.length === 0) {
+      return `Projects:
+1. DuckBuck Studios Full-Stack Cloud Application
+   • Backend: Golang (Gin), PostgreSQL, Redis.
+   • Frontend: Flutter (Dart).
+   • CI/CD pipelines for automation.
+   • Cloud: Google Cloud Run, Firebase, Azure services.
+   • Full end-to-end ownership (architecture → release).
+
+2. Personal Portfolio Website – rudrasahoo.me
+
+3. A.AI: Smart Surveillance (Hackathon – Andhra Pradesh Govt.)
+   • YOLOv8-based Gunny Bag Counter.
+   • AI Attendance System with TensorFlow + CCTV.
+   • Authorized entry detection (YOLOv8 + TensorFlow).
+   • Frontend: TypeScript dashboard.
+   • Backend: Python inference engine + APIs.`;
+    }
+
+    const projectsList = repositories.map((repo, index) => {
+      const languages = repo.languages ? Object.keys(repo.languages).join(', ') : 'Not specified';
+      const description = repo.description || 'No description available';
+      
+      return `${index + 1}. ${repo.name}
+   • ${description}
+   • Languages: ${languages}
+   • GitHub: ${repo.html_url}`;
+    }).join('\n\n');
+
+    return `Projects:\n${projectsList}`;
+  }
+
+  private findProjectByName(repositories: GitHubRepo[], projectName: string): GitHubRepo | null {
+    if (!repositories || repositories.length === 0) return null;
+    
+    const searchTerm = projectName.toLowerCase();
+    return repositories.find(repo => 
+      repo.name.toLowerCase().includes(searchTerm) ||
+      (repo.description && repo.description.toLowerCase().includes(searchTerm))
+    ) || null;
+  }
+
+  private generateProjectDetails(repo: GitHubRepo): string {
+    const languages = repo.languages ? Object.keys(repo.languages).join(', ') : 'Not specified';
+    const readmePreview = repo.readme_content ? 
+      repo.readme_content.substring(0, 1500) + (repo.readme_content.length > 1500 ? '...' : '') : 
+      'No README available';
+
+    return `
+DETAILED PROJECT INFORMATION FOR: ${repo.name}
+
+Description: ${repo.description || 'No description available'}
+Languages/Tech Stack: ${languages}
+GitHub URL: ${repo.html_url}
+
+README Content:
+${readmePreview}
+
+Use this detailed information to provide comprehensive answers about this specific project.`;
+  }
+
+  async generateResponse(message: string, repositories?: GitHubRepo[]): Promise<string> {
+    const projectsSection = this.generateProjectsSection(repositories || []);
+    
+    // Check if user is asking about a specific project
+    let specificProjectDetails = '';
+    if (repositories && repositories.length > 0) {
+      // Try to detect if the user is asking about a specific project
+      const projectKeywords = repositories.map(repo => repo.name.toLowerCase());
+      const messageWords = message.toLowerCase().split(/\s+/);
+      
+      for (const keyword of projectKeywords) {
+        if (messageWords.some(word => keyword.includes(word) || word.includes(keyword))) {
+          const project = this.findProjectByName(repositories, keyword);
+          if (project) {
+            specificProjectDetails = this.generateProjectDetails(project);
+            break;
+          }
+        }
+      }
+      
+      // Also check for partial matches with project names
+      if (!specificProjectDetails) {
+        for (const repo of repositories) {
+          const repoWords = repo.name.toLowerCase().split(/[-_\s]+/);
+          if (repoWords.some(repoWord => messageWords.some(msgWord => 
+            msgWord.includes(repoWord) || repoWord.includes(msgWord)
+          ))) {
+            specificProjectDetails = this.generateProjectDetails(repo);
+            break;
+          }
+        }
+      }
+    }
+    
     const systemPrompt = `You are Rudra Narayana Sahoo, a Full-stack Developer and AI-Prompt Engineer.
 You specialize in building fast, scalable web applications and cross-platform mobile apps (Android/iOS) with strong expertise in AI-driven solutions, frontend, backend, cloud, and DevOps.
 
@@ -45,22 +142,9 @@ Education:
 Employment:
 • Full-stack Developer at DuckBuck Studios (Dec 2023 – Present).
 
-Projects:
-1. DuckBuck Studios Full-Stack Cloud Application
-   • Backend: Golang (Gin), PostgreSQL, Redis.
-   • Frontend: Flutter (Dart).
-   • CI/CD pipelines for automation.
-   • Cloud: Google Cloud Run, Firebase, Azure services.
-   • Full end-to-end ownership (architecture → release).
+${projectsSection}
 
-2. Personal Portfolio Website – rudrasahoo.me
-
-3. A.AI: Smart Surveillance (Hackathon – Andhra Pradesh Govt.)
-   • YOLOv8-based Gunny Bag Counter.
-   • AI Attendance System with TensorFlow + CCTV.
-   • Authorized entry detection (YOLOv8 + TensorFlow).
-   • Frontend: TypeScript dashboard.
-   • Backend: Python inference engine + APIs.
+${specificProjectDetails}
 
 Skills:
 Prompt Engineering, Node.js, Flutter, Golang, Google Cloud
@@ -76,6 +160,9 @@ Instructions:
 • ONLY answer questions about Rudra's professional background, skills, projects, education, experience, or career.
 • If asked about skills, projects, education, certificates, or experience — respond factually from the information above.
 • If asked about hobbies or personal interests, use the provided details above.
+• When discussing specific projects and detailed project information is available, use the README content and project details to provide comprehensive, technical explanations.
+• If someone asks about downloading resume, tell them: "You can download my resume by typing 'resume' in the terminal - it will show a download animation and save the PDF to your computer!"
+• When discussing specific projects and detailed project information is available, use the README content and project details to provide comprehensive, technical explanations.
 • If someone asks about downloading resume, tell them: "You can download my resume by typing 'resume' in the terminal - it will show a download animation and save the PDF to your computer!"
 • If someone asks about available commands, tell them: "You can type 'help' to see all available commands, or 'bye' to exit this chat and use other terminal commands."
 • For ANY question outside of Rudra's portfolio/resume (like general programming help, tutorials, explanations of concepts, or non-portfolio topics), respond with: "I'm Rudra-B, here to discuss Rudra Narayana Sahoo's portfolio and background. Please ask me about his skills, projects, experience, or professional journey."
