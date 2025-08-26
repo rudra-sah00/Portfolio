@@ -18,6 +18,60 @@ export class GeminiAPI {
     this.apiKey = apiKey;
   }
 
+  private generateTechStackAnalysis(repositories: GitHubRepo[]): string {
+    if (!repositories || repositories.length === 0) {
+      return `Tech Stack & Skills Analysis:
+• Frontend: React, Next.js, TypeScript, JavaScript, HTML, CSS, TailwindCSS, Flutter (Dart)
+• Backend: Node.js, Golang (Gin), Python, Express.js
+• Databases: PostgreSQL, MongoDB, MySQL, Firebase, Redis
+• Cloud & DevOps: Google Cloud Run, AWS, Azure, Firebase, Docker, CI/CD
+• AI/ML: TensorFlow, YOLOv8, Computer Vision, Prompt Engineering
+• Mobile: Flutter (Android/iOS cross-platform)
+• Tools: Git, VS Code, Postman, Docker`;
+    }
+
+    // Analyze languages from all repositories
+    const languageStats: Record<string, number> = {};
+    const totalRepos = repositories.length;
+    
+    repositories.forEach(repo => {
+      if (repo.languages) {
+        Object.keys(repo.languages).forEach(lang => {
+          languageStats[lang] = (languageStats[lang] || 0) + 1;
+        });
+      }
+    });
+
+    // Calculate percentages and sort by usage
+    const sortedLanguages = Object.entries(languageStats)
+      .map(([lang, count]) => ({
+        language: lang,
+        percentage: Math.round((count / totalRepos) * 100),
+        count
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
+
+    const topLanguages = sortedLanguages.slice(0, 8);
+    
+    const techStackSection = `Tech Stack & Skills Analysis (Based on ${totalRepos} GitHub Projects):
+
+Primary Languages & Frameworks:
+${topLanguages.map(({ language, percentage, count }) => 
+  `• ${language}: ${percentage}% proficiency (used in ${count}/${totalRepos} projects)`
+).join('\n')}
+
+Technology Categories:
+• Frontend: React, Next.js, TypeScript, JavaScript, HTML, CSS, TailwindCSS, Flutter
+• Backend: Node.js, Golang, Python, Express.js, API Development
+• Mobile: Flutter (Android/iOS cross-platform development)
+• Databases: PostgreSQL, MongoDB, MySQL, Firebase, Redis
+• Cloud & DevOps: Google Cloud Run, AWS, Azure, Firebase, Docker, CI/CD
+• AI/ML: TensorFlow, YOLOv8, Computer Vision, Prompt Engineering
+• Tools: Git, VS Code, Postman, Docker, Terminal/CLI`;
+
+    return techStackSection;
+  }
+
   private generateProjectsSection(repositories: GitHubRepo[]): string {
     if (!repositories || repositories.length === 0) {
       return `Projects:
@@ -80,23 +134,20 @@ ${readmePreview}
 Use this detailed information to provide comprehensive answers about this specific project.`;
   }
 
-  async generateResponse(message: string, repositories?: GitHubRepo[]): Promise<string> {
-    const projectsSection = this.generateProjectsSection(repositories || []);
+  async sendMessage(message: string, repositories: GitHubRepo[] = []): Promise<string> {
+    const projectsSection = this.generateProjectsSection(repositories);
+    const techStackAnalysis = this.generateTechStackAnalysis(repositories);
     
-    // Check if user is asking about a specific project
+    // Check if the user is asking about a specific project
     let specificProjectDetails = '';
     if (repositories && repositories.length > 0) {
-      // Try to detect if the user is asking about a specific project
-      const projectKeywords = repositories.map(repo => repo.name.toLowerCase());
       const messageWords = message.toLowerCase().split(/\s+/);
       
-      for (const keyword of projectKeywords) {
-        if (messageWords.some(word => keyword.includes(word) || word.includes(keyword))) {
-          const project = this.findProjectByName(repositories, keyword);
-          if (project) {
-            specificProjectDetails = this.generateProjectDetails(project);
-            break;
-          }
+      // Check for exact matches first
+      for (const repo of repositories) {
+        if (messageWords.some(word => repo.name.toLowerCase().includes(word) || word.includes(repo.name.toLowerCase()))) {
+          specificProjectDetails = this.generateProjectDetails(repo);
+          break;
         }
       }
       
@@ -144,10 +195,9 @@ Employment:
 
 ${projectsSection}
 
-${specificProjectDetails}
+${techStackAnalysis}
 
-Skills:
-Prompt Engineering, Node.js, Flutter, Golang, Google Cloud
+${specificProjectDetails}
 
 Languages:
 English, Odia, Hindi
@@ -158,10 +208,10 @@ Coding, Gaming, Music, Reading, Hiking, Travelling
 Instructions:
 • You are Rudra-B, representing Rudra Narayana Sahoo in this portfolio terminal.
 • ONLY answer questions about Rudra's professional background, skills, projects, education, experience, or career.
-• If asked about skills, projects, education, certificates, or experience — respond factually from the information above.
+• When asked about skills, tech stack, or programming languages, use the detailed Tech Stack Analysis provided above which shows real data from GitHub repositories.
+• When asked about tech stack percentages or which languages/technologies I'm good at, refer to the percentage data in the Tech Stack Analysis.
+• If asked about projects, education, certificates, or experience — respond factually from the information above.
 • If asked about hobbies or personal interests, use the provided details above.
-• When discussing specific projects and detailed project information is available, use the README content and project details to provide comprehensive, technical explanations.
-• If someone asks about downloading resume, tell them: "You can download my resume by typing 'resume' in the terminal - it will show a download animation and save the PDF to your computer!"
 • When discussing specific projects and detailed project information is available, use the README content and project details to provide comprehensive, technical explanations.
 • If someone asks about downloading resume, tell them: "You can download my resume by typing 'resume' in the terminal - it will show a download animation and save the PDF to your computer!"
 • If someone asks about available commands, tell them: "You can type 'help' to see all available commands, or 'bye' to exit this chat and use other terminal commands."

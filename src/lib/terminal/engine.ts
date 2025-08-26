@@ -209,7 +209,7 @@ export class TerminalEngine {
       // Handle direct message to AI agent
       if (this.state.chatSession.agent.id === 'rudra-b') {
         try {
-          const response = await geminiAPI.generateResponse(trimmedInput, this.repositories);
+          const response = await geminiAPI.sendMessage(trimmedInput, this.repositories);
           
           // Add both messages to chat session
           this.state.chatSession.messages.push(
