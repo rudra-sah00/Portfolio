@@ -522,23 +522,27 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
       
       // Cleanup function to restore scrolling and viewport when terminal closes
       return () => {
-        // Restore body styles
-        document.body.style.overflow = originalOverflow;
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.width = originalWidth;
-        
-        // Restore scroll position
-        window.scrollTo(0, scrollY);
-        
+        // Restore body styles first
+        document.body.style.overflow = originalOverflow || '';
+        document.body.style.position = originalPosition || '';
+        document.body.style.top = originalTop || '';
+        document.body.style.width = originalWidth || '';
+
+        // Remove event listeners
+        document.removeEventListener('touchmove', preventTouchMove);
+        document.removeEventListener('wheel', preventWheel);
+
         // Restore viewport
         if (viewport && originalViewport) {
           viewport.setAttribute('content', originalViewport);
         }
-        
-        // Remove event listeners
-        document.removeEventListener('touchmove', preventTouchMove);
-        document.removeEventListener('wheel', preventWheel);
+
+        // Restore scroll position after styles are reset
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          // Failsafe: always re-enable scrolling
+          document.body.style.overflow = '';
+        }, 0);
       };
     }
   }, [isOpen]);
