@@ -5,9 +5,15 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Compare } from '@/components/ui/compare';
 import { ContainerTextFlip } from '@/components/ui/container-text-flip';
+import { GitHubRepo } from '@/types';
 import TerminalPopup from './TerminalPopup';
 
-const Hero = () => {
+interface HeroProps {
+  repositories: GitHubRepo[];
+  loading: boolean;
+}
+
+const Hero = ({ repositories, loading }: HeroProps) => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
   useEffect(() => {
@@ -122,7 +128,9 @@ const Hero = () => {
       {/* Terminal Popup */}
       <TerminalPopup 
         isOpen={isTerminalOpen} 
-        onClose={handleTerminalClose} 
+        onClose={handleTerminalClose}
+        repositories={repositories}
+        loading={loading}
       />
     </>
   );

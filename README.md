@@ -304,9 +304,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 🌐 **Live Website**: [rudrasahoo.live](https://rudrasahoo.live)
 - 📧 **Email**: [rudranarayanaknr@gmail.com](mailto:rudranarayanaknr@gmail.com)
-- 💼 **LinkedIn**: [Rudra Sahoo](https://www.linkedin.com/in/rudra-narayan-sahoo-318b5427a/)
+- 💼 **LinkedIn**: [Rudra Sahoo](linkedin.com/in/rudra-narayana-sahoo-695342288)
 - 🐙 **GitHub**: [@rudra-sah00](https://github.com/rudra-sah00)
-- 📷 **Instagram**: [@rudra_sah_00](https://instagram.com/rudra_sah_00)
+- 📷 **Instagram**: [@rudra_sah_00](https://instagram.com/rudra.sah00)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/rudra-sah00/portfolio/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/rudra-sah00/portfolio/discussions)
 

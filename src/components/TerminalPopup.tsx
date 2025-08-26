@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { TerminalEngine } from '@/lib/terminal';
+import { GitHubRepo } from '@/types';
 
 interface TerminalPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  repositories: GitHubRepo[];
+  loading: boolean;
 }
 
-const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
+const TerminalPopup = ({ isOpen, onClose, repositories, loading }: TerminalPopupProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState('');
@@ -19,21 +22,68 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalBodyRef = useRef<HTMLDivElement>(null);
 
+  // Update terminal engine with repositories when they change
+  useEffect(() => {
+    if (repositories && repositories.length > 0) {
+      // Store repositories in terminal engine for use in commands
+      terminalEngine.setRepositories(repositories);
+    }
+  }, [repositories, terminalEngine]);
+
   // Function to format terminal text with proper styling
   const formatTerminalText = (text: string) => {
     if (text.startsWith('🤖 Rudra-B:')) {
       // Remove the prefix for processing
       const content = text.replace('🤖 Rudra-B: ', '');
       
-      // Process the content for better formatting
-      let formattedContent = content;
-      
-      // Handle bullet points
-      formattedContent = formattedContent.replace(/•\s/g, '  • ');
-      
       // Split the text into lines for better processing
-      const lines = formattedContent.split('\n');
+      const lines = content.split('\n');
       const processedLines = lines.map((line, lineIndex) => {
+        // Skip empty lines
+        if (line.trim() === '') {
+          return <div key={lineIndex} className="h-2"></div>;
+        }
+
+        // Handle numbered list items (1., 2., etc.)
+        const numberedMatch = line.match(/^(\d+)\.\s+\*\*([^*]+)\*\*:\s*(.+)$/);
+        if (numberedMatch) {
+          const [, number, projectName, description] = numberedMatch;
+          return (
+            <div key={lineIndex} className="mt-2 flex">
+              <span className="text-yellow-400 font-bold mr-2 min-w-[1.5rem]">{number}.</span>
+              <div>
+                <span className="text-cyan-400 font-bold">{projectName}:</span>
+                <span className="text-gray-300 ml-2">{description}</span>
+              </div>
+            </div>
+          );
+        }
+
+        // Handle bullet points with bold text
+        const bulletMatch = line.match(/^\s*•\s+\*\*([^*]+)\*\*:\s*(.+)$/);
+        if (bulletMatch) {
+          const [, projectName, description] = bulletMatch;
+          return (
+            <div key={lineIndex} className="mt-1 flex ml-4">
+              <span className="text-blue-400 mr-2">•</span>
+              <div>
+                <span className="text-cyan-400 font-bold">{projectName}:</span>
+                <span className="text-gray-300 ml-2">{description}</span>
+              </div>
+            </div>
+          );
+        }
+
+        // Handle regular bullet points
+        if (line.trim().startsWith('•')) {
+          return (
+            <div key={lineIndex} className="mt-1 ml-4">
+              <span className="text-blue-400 mr-2">•</span>
+              <span className="text-gray-300">{line.replace(/^\s*•\s*/, '')}</span>
+            </div>
+          );
+        }
+
         // Split each line into parts for bold formatting
         const parts = line.split(/(\*\*[^*]+\*\*)/g);
         
@@ -46,13 +96,6 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
                 return (
                   <span key={partIndex} className="text-green-400 font-bold">
                     {boldText}
-                  </span>
-                );
-              } else if (part.includes('•')) {
-                // Bullet points
-                return (
-                  <span key={partIndex} className="text-blue-300">
-                    {part}
                   </span>
                 );
               } else {
@@ -70,8 +113,11 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
       
       return (
         <div>
-          <span className="text-cyan-400 font-bold">🤖 Rudra-B: </span>
-          <div className="mt-1 leading-relaxed">
+          <div className="flex items-center mb-2">
+            <span className="text-cyan-400 text-xl mr-2">🤖</span>
+            <span className="text-purple-400 font-bold text-lg">Rudra-B:</span>
+          </div>
+          <div className="ml-6 leading-relaxed">
             {processedLines}
           </div>
         </div>
@@ -649,7 +695,7 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
                   <span className="text-purple-400 animate-pulse delay-100">●</span>
                   <span className="text-yellow-400 animate-pulse delay-200">●</span>
                   <span className="text-green-400 animate-pulse delay-300">●</span>
-                  <span className="ml-2 text-blue-300">AI is thinking...</span>
+                  <span className="ml-2 text-blue-300">Rudra-B thinking...</span>
                 </div>
               )}
               {/* Current Input Line - Only show when not typing */}
