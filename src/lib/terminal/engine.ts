@@ -1,6 +1,6 @@
 import { Command, CommandResult, TerminalState, ContactForm } from './types';
 import { createInitialState, getRootState } from './state';
-import { rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand } from './commands';
+import { rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand, projectsCommand } from './commands';
 import { GeminiAPI } from './chat/gemini';
 
 const geminiAPI = new GeminiAPI('AIzaSyA_dv4JMDA8FWaiiib_lx4Hqrjwe91JbVo');
@@ -15,7 +15,7 @@ export class TerminalEngine {
   }
 
   private registerCommands(): void {
-    const commands = [rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand];
+    const commands = [rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand, projectsCommand];
     commands.forEach(cmd => {
       this.commands.set(cmd.name, cmd);
     });

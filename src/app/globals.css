@@ -282,6 +282,16 @@ sup {
 .tabs_left-bottom {
 	flex-direction: column;
 	display: flex;
+	margin-top: 3rem; /* Increased top margin to prevent overlap */
+	margin-bottom: 1rem; /* Add bottom margin for better spacing */
+}
+
+/* Enhanced spacing for laptop/desktop view */
+@media (min-width: 1024px) {
+	.tabs_left-bottom {
+		margin-top: 4rem; /* Even more space on larger screens */
+		margin-bottom: 2rem;
+	}
 }
 
 .button {
@@ -342,6 +352,50 @@ sup {
 .button.is-grey.is-secondary {
 	color: var(--gray-300);
 	background-color: rgba(163, 163, 163, 0);
+}
+
+.button.is-github.is-secondary {
+	color: var(--gray-100);
+	background-color: rgba(36, 41, 47, 0.8);
+	border: 1px solid rgba(48, 164, 108, 0.3);
+	transition: all 0.3s ease;
+	backdrop-filter: blur(10px);
+	position: relative;
+	overflow: hidden;
+}
+
+.button.is-github.is-secondary::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(48, 164, 108, 0.2), transparent);
+	transition: left 0.5s;
+}
+
+.button.is-github.is-secondary:hover::before {
+	left: 100%;
+}
+
+.button.is-github.is-secondary:hover {
+	color: var(--white);
+	border-color: #30a46c;
+	background-color: rgba(36, 41, 47, 0.95);
+	box-shadow: 0 8px 32px rgba(48, 164, 108, 0.3);
+	transform: translateY(-2px);
+}
+
+.button.is-github.is-secondary:hover .button-circlee {
+	background: linear-gradient(135deg, #30a46c 0%, #238636 100%);
+	transform: translate3d(0px, -43%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg);
+	width: 100%;
+	box-shadow: 0 0 20px rgba(48, 164, 108, 0.4);
+}
+
+.background-color-github {
+	background: linear-gradient(135deg, #30a46c 0%, #238636 100%);
 }
 
 .button-text {

@@ -1,6 +1,7 @@
 import { Command, CommandResult, TerminalState } from '../types';
 import { getRootState, getUserState, getGeminiChatState } from '../state';
 import { getAgentById, ChatSession } from '../chat/types';
+import { fetchGitHubRepositories } from '@/lib/api/github';
 
 export const rootCommand: Command = {
   name: 'root',
@@ -32,7 +33,8 @@ export const helpCommand: Command = {
       '',
       '  <span class="text-yellow-300">!help</span>     - <span class="text-gray-300">Show this help message</span>',
       '  <span class="text-yellow-300">resume</span>    - <span class="text-gray-300">Download resume PDF</span>',
-      '  <span class="text-yellow-300">chat</span>      - <span class="text-gray-300">Start chat with Rudra-B</span>',
+      '  <span class="text-yellow-300">projects</span>  - <span class="text-gray-300">Show all GitHub projects</span>',
+      '  <span class="text-yellow-300">chat</span>      - <span class="text-gray-300">Start AI chat with live project data</span>',
       '  <span class="text-yellow-300">contact</span>   - <span class="text-gray-300">Contact form to reach out</span>',
       '  <span class="text-yellow-300">home</span>      - <span class="text-gray-300">Return to home directory</span>',
       '  <span class="text-yellow-300">root</span>      - <span class="text-gray-300">Switch to root user</span>',
@@ -123,16 +125,19 @@ export const aiChatCommand: Command = {
       '<span class="text-cyan-400">║</span>                      <span class="text-yellow-300 font-bold">RUDRA-B CHAT</span>                             <span class="text-cyan-400">║</span>',
       '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
       '',
-      '<span class="text-green-400">🤖 Rudra-B is now online and ready to discuss my portfolio!</span>',
+      '<span class="text-green-400">🤖 Rudra-B is now online with live GitHub project data!</span>',
       '',
       '<span class="text-cyan-300">💬 What you can ask about:</span>',
       '<span class="text-yellow-200">  • My technical skills and experience</span>',
-      '<span class="text-yellow-200">  • Projects I\'ve worked on</span>',
+      '<span class="text-yellow-200">  • Current projects (fetched live from GitHub)</span>',
+      '<span class="text-yellow-200">  • Detailed project information and tech stacks</span>',
       '<span class="text-yellow-200">  • Education and background</span>',
       '<span class="text-yellow-200">  • Professional journey and goals</span>',
-      '<span class="text-yellow-200">  • Type bye to exit chat session</span>',
       '',
-      '<span class="text-purple-300">What would you like to know about Rudra Narayana Sahoo?</span>',
+      '<span class="text-purple-300">🔥 Try asking: "show me your projects" or "tell me about [project name]"</span>',
+      '<span class="text-gray-400">   Type "bye" to exit chat session</span>',
+      '',
+      '<span class="text-green-300">What would you like to know about Rudra Narayana Sahoo?</span>',
       ''
     ];
 
@@ -313,5 +318,81 @@ export const scheduleCommand: Command = {
         ''
       ]
     };
+  }
+};
+
+export const projectsCommand: Command = {
+  name: 'projects',
+  description: 'Show all GitHub projects',
+  execute: async (): Promise<CommandResult> => {
+    try {
+      const repos = await fetchGitHubRepositories('rudra-sah00');
+      
+      if (repos.length === 0) {
+        return {
+          output: [
+            '<span class="text-yellow-400">⚠️  No repositories found</span>',
+            '<span class="text-gray-400">Check your internet connection or try again later</span>'
+          ]
+        };
+      }
+
+      const output = [
+        '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
+        '<span class="text-cyan-400">║</span>                    <span class="text-yellow-300 font-bold">GITHUB PROJECTS</span>                            <span class="text-cyan-400">║</span>',
+        '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
+        '',
+        `<span class="text-green-400">📁 Found ${repos.length} public repositories:</span>`,
+        ''
+      ];
+
+      // Group projects by personal vs organization
+      const personalProjects = repos.filter(repo => !repo.isOrganizationRepo);
+      const orgProjects = repos.filter(repo => repo.isOrganizationRepo);
+
+      if (personalProjects.length > 0) {
+        output.push('<span class="text-purple-300">🔸 Personal Projects:</span>');
+        personalProjects.forEach((repo, index) => {
+          const languages = repo.languages ? Object.keys(repo.languages).slice(0, 3).join(', ') : 'N/A';
+          output.push(
+            `<span class="text-yellow-200">  ${index + 1}. ${repo.name}</span>`,
+            `     <span class="text-gray-300">${repo.description || 'No description'}</span>`,
+            `     <span class="text-cyan-300">Tech:</span> <span class="text-green-300">${languages}</span>`,
+            `     <span class="text-blue-300">${repo.html_url}</span>`,
+            ''
+          );
+        });
+      }
+
+      if (orgProjects.length > 0) {
+        output.push('<span class="text-orange-300">🏢 Organization Projects:</span>');
+        orgProjects.forEach((repo, index) => {
+          const languages = repo.languages ? Object.keys(repo.languages).slice(0, 3).join(', ') : 'N/A';
+          output.push(
+            `<span class="text-yellow-200">  ${index + 1}. ${repo.name}</span> <span class="text-gray-500">(${repo.owner?.login})</span>`,
+            `     <span class="text-gray-300">${repo.description || 'No description'}</span>`,
+            `     <span class="text-cyan-300">Tech:</span> <span class="text-green-300">${languages}</span>`,
+            `     <span class="text-blue-300">${repo.html_url}</span>`,
+            ''
+          );
+        });
+      }
+
+      output.push(
+        '<span class="text-purple-300">💡 Tip: Use "chat" command and ask about specific projects for detailed info!</span>',
+        ''
+      );
+
+      return { output };
+    } catch (error) {
+      return {
+        output: [
+          '<span class="text-red-400">❌ Error fetching projects</span>',
+          '<span class="text-gray-400">Please check your internet connection and try again</span>',
+          '',
+          '<span class="text-yellow-400">You can still use the "chat" command to discuss projects</span>'
+        ]
+      };
+    }
   }
 };

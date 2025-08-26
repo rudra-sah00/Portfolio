@@ -1,5 +1,53 @@
 import React from 'react';
 import styles from './TechStack.module.css';
+import { 
+  SiJavascript, 
+  SiTypescript, 
+  SiPython, 
+  SiCplusplus, 
+  SiC, 
+  SiHtml5, 
+  SiCss3, 
+  SiPhp, 
+  SiRuby, 
+  SiGo, 
+  SiRust, 
+  SiSwift, 
+  SiKotlin, 
+  SiDart, 
+  SiVuedotjs, 
+  SiReact, 
+  SiShell, 
+  SiDocker,
+  SiNodedotjs,
+  SiMongodb,
+  SiMysql,
+  SiPostgresql,
+  SiRedis,
+  SiGit,
+  SiLinux,
+  SiMacos,
+  SiGithub,
+  SiExpress,
+  SiNextdotjs,
+  SiTailwindcss,
+  SiBootstrap,
+  SiSass,
+  SiWebpack,
+  SiVite,
+  SiNpm,
+  SiYarn,
+  SiJest,
+  SiCypress,
+  SiStorybook,
+  SiFigma,
+  SiAdobe,
+  SiCanva
+} from 'react-icons/si';
+import { IoLogoAndroid, IoLogoApple } from 'react-icons/io';
+import { FaCode, FaJava } from 'react-icons/fa';
+import { DiWindows } from 'react-icons/di';
+import { VscCode } from 'react-icons/vsc';
 
 interface TechStackProps {
   languages: Record<string, number>;
@@ -23,6 +71,9 @@ const TechStack: React.FC<TechStackProps> = ({ languages }) => {
     }))
     .sort((a, b) => b.bytes - a.bytes)
     .slice(0, 5); // Show top 5 languages
+
+  // Use compact layout for 4 or more languages to prevent overlap
+  const isCompactLayout = languagePercentages.length >= 4;
 
   const getLanguageColor = (language: string): string => {
     const colors: Record<string, string> = {
@@ -50,17 +101,73 @@ const TechStack: React.FC<TechStackProps> = ({ languages }) => {
     return colors[language] || '#61ffc9';
   };
 
+  const getLanguageIcon = (language: string) => {
+    const iconProps = { size: 18, className: styles.icon };
+    
+    const icons: Record<string, React.ReactElement> = {
+      JavaScript: <SiJavascript {...iconProps} />,
+      TypeScript: <SiTypescript {...iconProps} />,
+      Python: <SiPython {...iconProps} />,
+      Java: <FaJava {...iconProps} />,
+      'C++': <SiCplusplus {...iconProps} />,
+      C: <SiC {...iconProps} />,
+      HTML: <SiHtml5 {...iconProps} />,
+      CSS: <SiCss3 {...iconProps} />,
+      PHP: <SiPhp {...iconProps} />,
+      Ruby: <SiRuby {...iconProps} />,
+      Go: <SiGo {...iconProps} />,
+      Rust: <SiRust {...iconProps} />,
+      Swift: <SiSwift {...iconProps} />,
+      Kotlin: <SiKotlin {...iconProps} />,
+      Dart: <SiDart {...iconProps} />,
+      Vue: <SiVuedotjs {...iconProps} />,
+      React: <SiReact {...iconProps} />,
+      Shell: <SiShell {...iconProps} />,
+      PowerShell: <VscCode {...iconProps} />,
+      Dockerfile: <SiDocker {...iconProps} />,
+      'Node.js': <SiNodedotjs {...iconProps} />,
+      MongoDB: <SiMongodb {...iconProps} />,
+      MySQL: <SiMysql {...iconProps} />,
+      PostgreSQL: <SiPostgresql {...iconProps} />,
+      Redis: <SiRedis {...iconProps} />,
+      Git: <SiGit {...iconProps} />,
+      Linux: <SiLinux {...iconProps} />,
+      macOS: <SiMacos {...iconProps} />,
+      Windows: <DiWindows {...iconProps} />,
+      'VS Code': <VscCode {...iconProps} />,
+      GitHub: <SiGithub {...iconProps} />,
+      Express: <SiExpress {...iconProps} />,
+      'Next.js': <SiNextdotjs {...iconProps} />,
+      Tailwind: <SiTailwindcss {...iconProps} />,
+      Bootstrap: <SiBootstrap {...iconProps} />,
+      Sass: <SiSass {...iconProps} />,
+      Webpack: <SiWebpack {...iconProps} />,
+      Vite: <SiVite {...iconProps} />,
+      npm: <SiNpm {...iconProps} />,
+      Yarn: <SiYarn {...iconProps} />,
+      Jest: <SiJest {...iconProps} />,
+      Cypress: <SiCypress {...iconProps} />,
+      Storybook: <SiStorybook {...iconProps} />,
+      Figma: <SiFigma {...iconProps} />,
+      Adobe: <SiAdobe {...iconProps} />,
+      Canva: <SiCanva {...iconProps} />,
+      Android: <IoLogoAndroid {...iconProps} />,
+      iOS: <IoLogoApple {...iconProps} />
+    };
+    
+    return icons[language] || <FaCode {...iconProps} />;
+  };
+
   return (
-    <div className={styles.techStack}>
+    <div className={`${styles.techStack} ${isCompactLayout ? styles.compact : ''}`}>
       <h4 className={styles.title}>Tech Stack</h4>
       <div className={styles.list}>
         {languagePercentages.map(({ language, percentage }) => (
           <div key={language} className={styles.item}>
             <div className={styles.info}>
-              <span 
-                className={styles.dot}
-                style={{ backgroundColor: getLanguageColor(language) }}
-              ></span>
+              <div className={styles.iconWrapper}>
+                {getLanguageIcon(language)}
+              </div>
               <span className={styles.name}>{language}</span>
               <span className={styles.percentage}>{percentage}%</span>
             </div>

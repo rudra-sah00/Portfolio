@@ -15,7 +15,7 @@ const GitHubButton: React.FC<GitHubButtonProps> = ({ repositories, loading }) =>
         href={repositories[0]?.html_url} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="button is-grey is-secondary"
+        className="button is-github is-secondary"
       >
         <div className="button-text">View on GitHub</div>
         <div className="button-circle-wrapper">
@@ -32,7 +32,7 @@ const GitHubButton: React.FC<GitHubButtonProps> = ({ repositories, loading }) =>
             </svg>
           </div>
         </div>
-        <div className="button-circlee background-color-grey"></div>
+        <div className="button-circlee background-color-github"></div>
       </a>
     </div>
   );
