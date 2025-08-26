@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { TerminalEngine } from '@/lib/terminal';
+import { GitHubRepo } from '@/types';
 
 interface TerminalPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  repositories: GitHubRepo[];
+  loading: boolean;
 }
 
-const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
+const TerminalPopup = ({ isOpen, onClose, repositories, loading }: TerminalPopupProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const [currentInput, setCurrentInput] = useState('');
@@ -18,6 +21,14 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalBodyRef = useRef<HTMLDivElement>(null);
+
+  // Update terminal engine with repositories when they change
+  useEffect(() => {
+    if (repositories && repositories.length > 0) {
+      // Store repositories in terminal engine for use in commands
+      terminalEngine.setRepositories(repositories);
+    }
+  }, [repositories, terminalEngine]);
 
   // Function to format terminal text with proper styling
   const formatTerminalText = (text: string) => {
@@ -649,7 +660,7 @@ const TerminalPopup = ({ isOpen, onClose }: TerminalPopupProps) => {
                   <span className="text-purple-400 animate-pulse delay-100">●</span>
                   <span className="text-yellow-400 animate-pulse delay-200">●</span>
                   <span className="text-green-400 animate-pulse delay-300">●</span>
-                  <span className="ml-2 text-blue-300">AI is thinking...</span>
+                  <span className="ml-2 text-blue-300">Rudra-B thinking...</span>
                 </div>
               )}
               {/* Current Input Line - Only show when not typing */}

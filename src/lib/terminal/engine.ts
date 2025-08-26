@@ -1,21 +1,31 @@
 import { Command, CommandResult, TerminalState, ContactForm } from './types';
 import { createInitialState, getRootState } from './state';
-import { rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand } from './commands';
+import { rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand, projectsCommand } from './commands';
 import { GeminiAPI } from './chat/gemini';
+import { GitHubRepo } from '@/types';
 
 const geminiAPI = new GeminiAPI('AIzaSyA_dv4JMDA8FWaiiib_lx4Hqrjwe91JbVo');
 
 export class TerminalEngine {
   private commands: Map<string, Command> = new Map();
   private state: TerminalState;
+  public repositories: GitHubRepo[] = [];
 
   constructor() {
     this.state = createInitialState();
     this.registerCommands();
   }
 
+  public setRepositories(repos: GitHubRepo[]): void {
+    this.repositories = repos;
+  }
+
+  public getRepositories(): GitHubRepo[] {
+    return this.repositories;
+  }
+
   private registerCommands(): void {
-    const commands = [rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand];
+    const commands = [rootCommand, helpCommand, resumeCommand, clearCommand, aiChatCommand, homeCommand, byeCommand, contactCommand, exitContactCommand, playCommand, scheduleCommand, projectsCommand];
     commands.forEach(cmd => {
       this.commands.set(cmd.name, cmd);
     });
@@ -199,7 +209,7 @@ export class TerminalEngine {
       // Handle direct message to AI agent
       if (this.state.chatSession.agent.id === 'rudra-b') {
         try {
-          const response = await geminiAPI.generateResponse(trimmedInput);
+          const response = await geminiAPI.generateResponse(trimmedInput, this.repositories);
           
           // Add both messages to chat session
           this.state.chatSession.messages.push(
@@ -266,7 +276,10 @@ export class TerminalEngine {
       };
     }
 
-    const result = await command.execute(args, this.state);
+    // Pass repositories to projects command
+    const result = commandName === 'projects' 
+      ? await command.execute(args, this.state, this.repositories)
+      : await command.execute(args, this.state);
     
     // Update state if provided
     if (result.newState) {
