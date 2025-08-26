@@ -72,26 +72,40 @@ export async function GET(request: Request) {
             throw new Error('Repository owner information missing');
           }
 
-          // Fetch README - use the correct owner (could be user or organization)
-          const readmeResponse = await fetch(
-            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/readme`,
-            { headers }
-          );
-
-          // Fetch languages/tech stack - use the correct owner
-          const languagesResponse = await fetch(
-            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/languages`,
-            { headers }
-          );
+          // Helper function for fetch with timeout
+          const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeout = 5000) => {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+              const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+              });
+              clearTimeout(id);
+              return response;
+            } catch (error) {
+              clearTimeout(id);
+              throw error;
+            }
+          };
 
           let readme_content = '';
           let languages = {};
 
-          if (readmeResponse.ok) {
-            const readmeData = await readmeResponse.json();
-            readme_content = Buffer.from(readmeData.content, 'base64').toString('utf-8');
-          } else {
-            readme_content = `# ${repo.name}
+          // Fetch README with timeout and error handling
+          try {
+            const readmeResponse = await fetchWithTimeout(
+              `https://api.github.com/repos/${repo.owner.login}/${repo.name}/readme`,
+              { headers },
+              5000 // 5 second timeout
+            );
+
+            if (readmeResponse.ok) {
+              const readmeData = await readmeResponse.json();
+              readme_content = Buffer.from(readmeData.content, 'base64').toString('utf-8');
+            } else {
+              readme_content = `# ${repo.name}
 
 This repository doesn't have a README.md file.
 
@@ -99,10 +113,32 @@ This repository doesn't have a README.md file.
 **Description:** ${repo.description || 'No description available'}
 
 Click "View on GitHub" to explore the repository directly.`;
+            }
+          } catch (error) {
+            console.log(`README fetch failed for ${repo.name}:`, error instanceof Error ? error.message : 'Unknown error');
+            readme_content = `# ${repo.name}
+
+**Repository:** ${repo.name}
+**Description:** ${repo.description || 'No description available'}
+
+README content temporarily unavailable due to network timeout.
+Click "View on GitHub" to explore the repository directly.`;
           }
 
-          if (languagesResponse.ok) {
-            languages = await languagesResponse.json();
+          // Fetch languages with timeout and error handling
+          try {
+            const languagesResponse = await fetchWithTimeout(
+              `https://api.github.com/repos/${repo.owner.login}/${repo.name}/languages`,
+              { headers },
+              5000 // 5 second timeout
+            );
+
+            if (languagesResponse.ok) {
+              languages = await languagesResponse.json();
+            }
+          } catch (error) {
+            console.log(`Languages fetch failed for ${repo.name}:`, error instanceof Error ? error.message : 'Unknown error');
+            // Languages will remain as empty object
           }
 
           return {
@@ -119,7 +155,7 @@ Click "View on GitHub" to explore the repository directly.`;
             isOrganizationRepo: repo.owner?.type === 'Organization'
           };
         } catch (error) {
-          console.error(`Error fetching data for ${repo.name}:`, error);
+          console.error(`Error fetching data for ${repo.name}:`, error instanceof Error ? error.message : 'Unknown error');
           return {
             id: repo.id,
             name: repo.name,
@@ -127,10 +163,10 @@ Click "View on GitHub" to explore the repository directly.`;
             html_url: repo.html_url,
             readme_content: `# ${repo.name}
 
-Unable to load README for "${repo.name}".
-
 **Repository:** ${repo.name}
 **Description:** ${repo.description || 'No description available'}
+
+*Note: Some repository details are temporarily unavailable due to network issues.*
 
 Click "View on GitHub" to explore the repository directly.`,
             languages: {},

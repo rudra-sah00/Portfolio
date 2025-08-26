@@ -21,6 +21,83 @@ export class TerminalEngine {
     });
   }
 
+  private formatChatResponse(response: string): string[] {
+    const lines = response.split('\n');
+    const formattedLines: string[] = [];
+    
+    // Add Rudra-B header
+    formattedLines.push('');
+    formattedLines.push('<span class="text-cyan-400">🤖</span> <span class="text-purple-400 font-bold">Rudra-B:</span>');
+    formattedLines.push('');
+    
+    for (let line of lines) {
+      line = line.trim();
+      if (!line) {
+        formattedLines.push('');
+        continue;
+      }
+      
+      // Format different types of content
+      if (line.startsWith('**') && line.endsWith('**')) {
+        // Project names or section headers
+        const text = line.replace(/\*\*/g, '');
+        if (text.includes('PROJECTS') || text.includes('PROJECT OVERVIEW') || text.includes('TECHNOLOGY STACK')) {
+          formattedLines.push(`<span class="text-yellow-300 font-bold">📋 ${text}</span>`);
+        } else {
+          formattedLines.push(`<span class="text-cyan-300 font-bold">🚀 ${text}</span>`);
+        }
+      } else if (line.startsWith('• **') || line.startsWith('*   **')) {
+        // Individual project entries
+        const match = line.match(/\*?\s*•?\s*\*\*([^*]+)\*\*:?\s*(.*)/);
+        if (match) {
+          const projectName = match[1];
+          const description = match[2];
+          formattedLines.push(`<span class="text-green-400">▶</span> <span class="text-cyan-300 font-semibold">${projectName}:</span>`);
+          if (description) {
+            formattedLines.push(`  <span class="text-gray-300">${description}</span>`);
+          }
+        } else {
+          formattedLines.push(`<span class="text-green-400">•</span> <span class="text-white">${line.replace(/^[•\-*]\s*/, '')}</span>`);
+        }
+      } else if (line.startsWith('- **') || line.includes('GitHub:') || line.includes('GitHub URL:')) {
+        // Technical details and GitHub links
+        if (line.includes('GitHub:') || line.includes('GitHub URL:')) {
+          const urlMatch = line.match(/(https:\/\/github\.com\/[^\s\]]+)/);
+          if (urlMatch) {
+            formattedLines.push(`  <span class="text-blue-400">🔗 GitHub:</span> <span class="text-blue-300 underline">${urlMatch[1]}</span>`);
+          }
+        } else if (line.includes('Technologies:') || line.includes('Tech Stack:')) {
+          const techMatch = line.match(/\*\*([^*]+)\*\*:\s*(.*)/);
+          if (techMatch) {
+            formattedLines.push(`  <span class="text-yellow-400">🛠️  ${techMatch[1]}:</span> <span class="text-orange-300">${techMatch[2]}</span>`);
+          }
+        } else {
+          const detailMatch = line.match(/\s*-\s*\*\*([^*]+)\*\*:\s*(.*)/);
+          if (detailMatch) {
+            formattedLines.push(`  <span class="text-purple-300">📌 ${detailMatch[1]}:</span> <span class="text-gray-200">${detailMatch[2]}</span>`);
+          }
+        }
+      } else if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
+        // Regular bullet points
+        const content = line.replace(/^[•\-*]\s*/, '');
+        if (content.includes('Frontend:') || content.includes('Backend:') || content.includes('Database:')) {
+          formattedLines.push(`  <span class="text-yellow-400">⚡</span> <span class="text-orange-300">${content}</span>`);
+        } else {
+          formattedLines.push(`  <span class="text-green-400">•</span> <span class="text-gray-200">${content}</span>`);
+        }
+      } else if (line.match(/^[A-Z\s]+:$/)) {
+        // Section headers like "PERSONAL PROJECTS:"
+        formattedLines.push(`<span class="text-yellow-300 font-bold">📂 ${line}</span>`);
+      } else {
+        // Regular text
+        formattedLines.push(`<span class="text-gray-200">${line}</span>`);
+      }
+    }
+    
+    formattedLines.push('');
+    return formattedLines;
+  }
+
   public async executeCommand(input: string): Promise<CommandResult> {
     const trimmedInput = input.trim();
     
@@ -216,9 +293,7 @@ export class TerminalEngine {
           );
           
           return {
-            output: [
-              `<span class="text-cyan-400">🤖</span> <span class="text-purple-400 font-semibold">Rudra-B:</span> <span class="text-green-300">${response}</span>`
-            ]
+            output: this.formatChatResponse(response)
           };
         } catch {
           return {
