@@ -132,17 +132,98 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
         >
           <div className="tabs_sticky-wrapper">
             <div className="tabs_container">
-              <div className="tabs_component">
-                <div className="tabs_left">
+              <div className="tabs_component flex flex-col lg:flex-row gap-4 lg:gap-8">
+                <div className="tabs_left w-full lg:w-auto lg:min-w-[400px] lg:max-w-[500px]">
                   <ProjectInfo repositories={repositories} loading={loading} />
                   <GitHubButton repositories={repositories} loading={loading} />
                 </div>
-                <ReadmeSection repositories={repositories} loading={loading} />
+                <div className="readme_section w-full lg:flex-1 min-w-0">
+                  <ReadmeSection repositories={repositories} loading={loading} />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Responsive Styles */}
+      <style jsx>{`
+        .tabs_component {
+          overflow-x: hidden;
+          word-wrap: break-word;
+          hyphens: auto;
+        }
+        
+        .tabs_left {
+          flex-shrink: 0;
+        }
+        
+        .readme_section {
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+        
+        /* Small laptop adjustments */
+        @media (max-width: 1366px) and (min-width: 1024px) {
+          .tabs_component {
+            padding: 0 1rem;
+            gap: 1rem !important;
+          }
+          
+          .tabs_left {
+            min-width: 300px !important;
+            max-width: 400px !important;
+          }
+          
+          .readme_section {
+            font-size: 0.9rem;
+            line-height: 1.5;
+          }
+        }
+        
+        /* Extra small laptops (14 inch and below) */
+        @media (max-width: 1280px) and (min-width: 1024px) {
+          .tabs_component {
+            flex-direction: column !important;
+            gap: 2rem !important;
+          }
+          
+          .tabs_left {
+            width: 100% !important;
+            max-width: none !important;
+            min-width: auto !important;
+          }
+          
+          .readme_section {
+            width: 100% !important;
+            margin-top: 1rem;
+          }
+        }
+        
+        /* Tablet and mobile */
+        @media (max-width: 1023px) {
+          .tabs_component {
+            flex-direction: column !important;
+            padding: 0 0.5rem;
+            gap: 1.5rem !important;
+          }
+          
+          .tabs_left,
+          .readme_section {
+            width: 100% !important;
+            max-width: none !important;
+            min-width: auto !important;
+          }
+        }
+        
+        /* Mobile specific */
+        @media (max-width: 768px) {
+          .tabs_component {
+            padding: 0 0.25rem;
+            gap: 1rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };
