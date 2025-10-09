@@ -1,0 +1,76 @@
+name: Stale PR Management
+
+on:
+  schedule:
+    # Run every day at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  stale:
+    name: Mark Stale PRs
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Mark stale PRs and issues
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # PR settings
+          stale-pr-message: |
+            👋 This PR has been automatically marked as stale because it has not had recent activity.
+            
+            It will be closed in 7 days if no further activity occurs.
+            
+            If you're still working on this:
+            - Push new commits
+            - Leave a comment
+            - Add the "keep-alive" label
+            
+            Thank you for your contributions! 🙏
+          
+          close-pr-message: |
+            🔒 This PR has been automatically closed due to inactivity.
+            
+            Feel free to reopen it if you'd like to continue working on it.
+            
+            Thank you for your interest in contributing! 💙
+          
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
+          stale-pr-label: 'stale'
+          exempt-pr-labels: 'keep-alive,in-progress,blocked'
+          
+          # Issue settings
+          stale-issue-message: |
+            👋 This issue has been automatically marked as stale because it has not had recent activity.
+            
+            It will be closed in 14 days if no further activity occurs.
+            
+            If this is still relevant:
+            - Leave a comment
+            - Add the "keep-alive" label
+            
+            Thank you! 🙏
+          
+          close-issue-message: |
+            🔒 This issue has been automatically closed due to inactivity.
+            
+            Feel free to reopen it if it's still relevant.
+            
+            Thank you! 💙
+          
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'keep-alive,bug,enhancement,help-wanted'
+          
+          # General settings
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          ascending: true
