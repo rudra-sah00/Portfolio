@@ -10,10 +10,14 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 ![GSAP](https://img.shields.io/badge/GSAP-3.0-88CE02)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0-38B2AC)
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)
+[![codecov](https://codecov.io/gh/rudra-sah00/Portfolio/branch/main/graph/badge.svg)](https://codecov.io/gh/rudra-sah00/Portfolio)
+![Build Status](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)
+![Test Coverage](https://img.shields.io/badge/coverage-87%25-green)
 
 ## ✨ Features
 
 ### 🎯 Core Features
+
 - **GitHub Integration**: Automatically fetches and displays your repositories with real-time data
 - **Organization Support**: Shows repositories from organizations you're part of with custom badges
 - **Interactive Terminal**: Built-in terminal with AI chat capabilities powered by Google Gemini
@@ -24,6 +28,7 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 - **Performance Optimized**: Built with Next.js 15 App Router and optimized for speed
 
 ### 🎨 Animation Features
+
 - **GSAP Timeline Animations**: Complex animation sequences with precise timing
 - **Scroll-Triggered Animations**: Elements animate as they enter the viewport
 - **Floating Dock**: Smooth hover animations for social media links
@@ -33,6 +38,7 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 - **Stagger Animations**: Coordinated animations across multiple elements
 
 ### 📊 Repository Showcase
+
 - **README Rendering**: Full GitHub-flavored markdown with syntax highlighting
 - **Mermaid Diagrams**: Supports complex Mermaid diagrams in README files
 - **Tech Stack Visualization**: Interactive language breakdown with animated progress bars
@@ -42,6 +48,7 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 - **Real-time Data**: Fresh repository data fetched from GitHub API
 
 ### 🤖 AI Terminal Experience
+
 - **Gemini Integration**: Advanced AI-powered chat assistance with context awareness
 - **Command System**: Full Unix-like command interface with autocomplete
 - **Contact Form**: Integrated email functionality with form validation
@@ -50,6 +57,7 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 - **Chat Mode**: Seamless transition between command and chat modes
 
 ### 🎯 Advanced Customizations
+
 - **Vercel Analytics**: Real-time website analytics and performance monitoring
 - **Speed Insights**: Page performance tracking and optimization
 - **Custom CSS Variables**: Consistent theming system across all components
@@ -66,29 +74,29 @@ graph TB
     A[Next.js 15 App Router] --> B[Server Components]
     A --> C[Client Components]
     A --> D[GSAP Animations]
-    
+
     B --> E[API Routes]
     E --> F[GitHub API]
     E --> G[Email Service]
     E --> H[Gemini AI]
-    
+
     C --> I[Terminal Engine]
     C --> J[Scroll Animations]
     C --> K[Project Showcase]
     C --> L[Floating Dock UI]
-    
+
     D --> M[Timeline Animations]
     D --> N[Scroll Triggers]
     D --> O[Interactive Effects]
-    
+
     F --> P[Repository Data]
     F --> Q[README Content]
     F --> R[Language Stats]
     F --> S[Organization Info]
-    
+
     G --> T[Contact Form]
     I --> U[AI Chat Mode]
-    
+
     style A fill:#0070f3
     style F fill:#24292e
     style H fill:#4285f4
@@ -96,6 +104,7 @@ graph TB
 ```
 
 ### 🛠️ Tech Stack
+
 - **Frontend**: Next.js 15, React 18, TypeScript 5
 - **Styling**: Tailwind CSS, CSS Modules, Custom CSS Variables
 - **Animations**: GSAP 3, Framer Motion, CSS Transitions
@@ -107,29 +116,34 @@ graph TB
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm/yarn/pnpm
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/rudra-sah00/portfolio.git
    cd portfolio
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Configure GitHub Username**
    Update the username in `src/components/ProjectsSection.tsx`:
+
    ```typescript
-   const username = 'your-github-username';
+   const username = "your-github-username";
    ```
 
 4. **Start Development Server**
+
    ```bash
    npm run dev
    ```
@@ -176,6 +190,7 @@ portfolio/
 ### GitHub Token Setup
 
 The portfolio comes with a pre-configured GitHub token for fetching repository data. If you need to use your own token, update it in:
+
 - `src/app/api/repositories/route.ts` (line 23)
 
 ### AI Chat Integration
@@ -189,44 +204,50 @@ Contact form emails are configured to work out of the box.
 ## 🎨 Customization
 
 ### Styling
+
 - **CSS Variables**: Located in `src/app/globals.css`
 - **Component Styles**: Individual `.module.css` files
 - **Responsive Design**: Mobile-first approach with breakpoints
 
 ### GitHub Integration
+
 - **Username**: Update in `ProjectsSection.tsx`
 - **Repository Filtering**: Modify API route logic
 - **README Rendering**: Customize in `ReadmeViewer.tsx`
 
 ### Terminal Commands
+
 - **Add Commands**: Extend `src/lib/terminal/commands/index.ts`
 - **AI Integration**: Configure in `src/lib/terminal/chat/`
 
 ## 📊 Features in Detail
 
 ### Repository Showcase
+
 ```mermaid
 sequenceDiagram
     participant Client
     participant API
     participant GitHub
-    
+
     Client->>API: Request repositories
     API->>GitHub: Fetch user repos
     API->>GitHub: Fetch org repos
     API->>GitHub: Fetch README content
     API->>GitHub: Fetch language stats
     API->>Client: Return processed data
-    
+
     Note over Client: Render with animations
 ```
 
 ### Tech Stack Visualization
+
 - Language percentage calculation
 - Color-coded progress bars
 - Responsive layout
 
 ### Organization Support
+
 - Automatic detection of organization repositories
 - Visual badges with organization names
 - Separate filtering and display logic
@@ -236,6 +257,7 @@ sequenceDiagram
 ### Vercel (Recommended)
 
 1. **Connect Repository**
+
    ```bash
    vercel --prod
    ```
@@ -249,6 +271,7 @@ sequenceDiagram
 ### Other Platforms
 
 Build the project:
+
 ```bash
 npm run build
 ```
@@ -272,11 +295,11 @@ npm run build
 
 All API keys are pre-configured in the application:
 
-| Service | Status | Location |
-|---------|--------|----------|
-| GitHub API | ✅ Configured | `src/app/api/repositories/route.ts` |
-| Gemini AI | ✅ Configured | `src/lib/terminal/chat/gemini.ts` |
-| Email Service | ✅ Configured | `src/app/api/contact/route.ts` |
+| Service       | Status        | Location                            |
+| ------------- | ------------- | ----------------------------------- |
+| GitHub API    | ✅ Configured | `src/app/api/repositories/route.ts` |
+| Gemini AI     | ✅ Configured | `src/lib/terminal/chat/gemini.ts`   |
+| Email Service | ✅ Configured | `src/app/api/contact/route.ts`      |
 
 **Note**: API keys are hardcoded for easy deployment. For production use with sensitive data, consider using environment variables.
 

@@ -27,10 +27,19 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
     "clean": "rm -rf .next",
-    "analyze": "cross-env ANALYZE=true npm run build",
-    "export": "next export"
+    "analyze": "ANALYZE=true npm run build",
+    "export": "next export",
+    "prepare": "husky",
+    "pre-commit": "lint-staged",
+    "validate": "npm run type-check && npm run lint && npm run format:check && npm run test:ci"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.34.1",
@@ -62,14 +71,32 @@
     "terminal.js": "^1.0.11"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^1.9.1",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^15.5.4",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5",
+    "zod": "^4.1.12"
   }
 }

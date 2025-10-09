@@ -5,7 +5,6 @@
  **/
 
 import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -45,7 +44,7 @@ const FloatingDockMobile = ({
     <motion.div
       className={cn(
         "mx-auto flex h-12 items-center justify-center gap-4 rounded-2xl bg-gray-50 px-6 py-2 md:hidden dark:bg-neutral-900",
-        className,
+        className
       )}
       style={{ minWidth: "280px", maxWidth: "320px" }}
     >
@@ -70,7 +69,7 @@ const FloatingDockDesktop = ({
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
         "mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-gray-50 px-4 pb-3 md:flex dark:bg-neutral-900",
-        className,
+        className
       )}
     >
       {items.map((item) => (
@@ -113,9 +112,7 @@ function MobileIconContainer({
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="flex h-4 w-4 items-center justify-center">
-          {icon}
-        </div>
+        <div className="flex h-4 w-4 items-center justify-center">{icon}</div>
       </motion.div>
     </a>
   );
@@ -143,11 +140,15 @@ function IconContainer({
   const widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
   const heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
 
-  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
+  const widthTransformIcon = useTransform(
+    distance,
+    [-150, 0, 150],
+    [20, 40, 20]
+  );
   const heightTransformIcon = useTransform(
     distance,
     [-150, 0, 150],
-    [20, 40, 20],
+    [20, 40, 20]
   );
 
   const width = useSpring(widthTransform, {
