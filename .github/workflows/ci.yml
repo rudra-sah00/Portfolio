@@ -170,23 +170,69 @@ jobs:
       - name: Check for outdated packages
         run: npm outdated || true
 
-  pr-checks:
-    name: PR Status Check
+  deploy-production:
+    name: Deploy to Vercel (Production)
     runs-on: ubuntu-latest
+    # Only deploy to production if:
+    # 1. Push to main branch
+    # 2. All tests and checks passed
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-and-type-check, test, build, security-audit]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
+      - name: Comment deployment success
+        uses: actions/github-script@v7
+        if: success()
+        with:
+          script: |
+            const sha = context.sha.substring(0, 7);
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `🚀 **Deployed to Production**\n\nCommit: ${sha}\n✅ All checks passed\n✅ Deployed to Vercel`
+            });
+
+  deploy-preview:
+    name: Deploy to Vercel (Preview)
+    runs-on: ubuntu-latest
+    # Deploy preview for PRs after all checks pass
     if: github.event_name == 'pull_request'
     needs: [lint-and-type-check, test, build, security-audit]
-
+    
     steps:
-      - name: All checks passed
-        run: echo "All PR checks passed successfully! ✅"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Comment PR success
+      - name: Deploy Preview to Vercel
+        uses: amondnet/vercel-action@v25
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+
+      - name: Comment PR with preview URL
         uses: actions/github-script@v7
+        if: success()
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ All CI checks passed! This PR is ready for review.'
+              body: `✅ **All CI checks passed!** This PR is ready for review.\n\n🔍 **Preview Deployment:** ${{ steps.vercel-deploy.outputs.preview-url }}\n\n✅ Tests Passed\n✅ Coverage Met\n✅ Build Successful`
             });
