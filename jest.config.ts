@@ -33,7 +33,7 @@ const config: Config = {
       statements: 80,
     },
   },
-  coverageReporters: ["text", "lcov", "json", "html"],
+  coverageReporters: ["text", "lcov", "json", "json-summary", "html"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
   transformIgnorePatterns: [
