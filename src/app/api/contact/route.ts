@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { env } from "@/lib/env";
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +19,8 @@ export async function POST(request: Request) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "rudra.workwith@gmail.com",
-        pass: "qgoe abhn agrg svus",
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 
@@ -280,8 +281,8 @@ export async function POST(request: Request) {
 
     // Email options
     const mailOptions = {
-      from: '"Portfolio Contact Form" <rudra.workwith@gmail.com>',
-      to: "rudranarayanaknr@gmail.com",
+      from: `"Portfolio Contact Form" <${env.EMAIL_USER}>`,
+      to: env.EMAIL_TO,
       subject: `🔥 New Contact: ${name} wants to connect!`,
       html: htmlTemplate,
       text: `

@@ -317,16 +317,16 @@ Instructions:
         }
       } catch (error) {
         lastError = error as Error;
-        console.error(`Gemini API Error with key ${attempt + 1}:`, error);
 
-        // Try next key if available
+        // Try next key if available (silently switch to fallback)
         if (!this.switchToNextKey()) {
           break; // No more keys to try
         }
+        // Continue to next attempt without logging error
       }
     }
 
-    // All keys failed
+    // All keys failed - only show error if all attempts exhausted
     console.error("All Gemini API keys failed:", lastError);
     return "Sorry, I encountered an error while processing your request. Please try again.";
   }
