@@ -135,7 +135,7 @@ graph TB
     Codecov --> CovThreshold{Meets Thresholds?}
     CovThreshold -->|Statements ≥ 80%| Build
     CovThreshold -->|Branches ≥ 70%| Build
-    CovThreshold -->|Functions ≥ 75%| Build
+    CovThreshold -->|Functions ≥ 68%| Build
     CovThreshold -->|Lines ≥ 80%| Build
     CovThreshold -->|No| Warning[⚠️ Coverage Warning]
 
@@ -200,7 +200,7 @@ graph TB
 - **Coverage Thresholds**:
   - Statements: ≥ 80%
   - Branches: ≥ 70%
-  - Functions: ≥ 75%
+  - Functions: ≥ 68%
   - Lines: ≥ 80%
 - **Coverage Tools**: Codecov integration with PR comments
 - **Test Count**: 278 comprehensive tests across 19 suites

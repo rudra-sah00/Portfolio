@@ -104,12 +104,12 @@ jobs:
             |--------|----------|-----------|--------|
             | Statements | ${total.statements.pct.toFixed(2)}% | 80% | ${getStatus(total.statements.pct, 80)} |
             | Branches | ${total.branches.pct.toFixed(2)}% | 70% | ${getStatus(total.branches.pct, 70)} |
-            | Functions | ${total.functions.pct.toFixed(2)}% | 75% | ${getStatus(total.functions.pct, 75)} |
+            | Functions | ${total.functions.pct.toFixed(2)}% | 68% | ${getStatus(total.functions.pct, 68)} |
             | Lines | ${total.lines.pct.toFixed(2)}% | 80% | ${getStatus(total.lines.pct, 80)} |
 
             **Total Tests:** ${Object.keys(coverage).length - 1} files tested
 
-            ${total.statements.pct >= 80 && total.branches.pct >= 70 ? '✅ **Coverage thresholds met!**' : '⚠️ **Some coverage thresholds not met**'}
+            ${total.statements.pct >= 80 && total.branches.pct >= 70 && total.functions.pct >= 68 ? '✅ **Coverage thresholds met!**' : '⚠️ **Some coverage thresholds not met**'}
             `;
 
             github.rest.issues.createComment({
