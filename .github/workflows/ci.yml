@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, production]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, production]
     types: [opened, synchronize, reopened, ready_for_review]
 
 # Required permissions for the workflow
@@ -261,10 +261,10 @@ jobs:
   deploy-production:
     name: Deploy to Vercel (Production)
     runs-on: ubuntu-latest
-    # Only deploy to production if:
-    # 1. Push to main branch
+    # Only deploy to production when:
+    # 1. Push to production branch (after merge from main)
     # 2. All tests and checks passed
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
     needs: [lint-and-type-check, test, build, security-audit]
 
     steps:
@@ -290,7 +290,40 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: context.sha,
-              body: `🚀 **Deployed to Production**\n\nCommit: ${sha}\n✅ All checks passed\n✅ Deployed to Vercel`
+              body: `🚀 **Deployed to Production**\n\nCommit: ${sha}\n✅ All checks passed\n✅ Deployed to Vercel Production\n🌐 Live at: https://rudrasahoo.live`
+            });
+
+  deploy-staging:
+    name: Deploy to Vercel (Staging)
+    runs-on: ubuntu-latest
+    # Deploy staging when push to main branch (after PR merge from develop)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-and-type-check, test, build, security-audit]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        id: vercel-staging
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+
+      - name: Comment staging deployment
+        uses: actions/github-script@v7
+        if: success()
+        with:
+          script: |
+            const sha = context.sha.substring(0, 7);
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `🎭 **Deployed to Staging**\n\nCommit: ${sha}\n✅ All checks passed\n🔍 Preview URL: ${{ steps.vercel-staging.outputs.preview-url }}\n\n_Ready to promote to production? Create a PR from main → production_`
             });
 
   deploy-preview:
