@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GitHubRepo } from "@/types";
+import { env } from "@/lib/env";
 
 export async function GET(request: Request) {
   try {
@@ -16,17 +17,20 @@ export async function GET(request: Request) {
       );
     }
 
-    // Prepare headers for GitHub API with hardcoded token
+    // Prepare headers for GitHub API with token from environment
     const headers: Record<string, string> = {
       Accept: "application/vnd.github.v3+json",
       "User-Agent": "Portfolio-App",
-      Authorization:
-        "Bearer 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",
     };
 
-    // Fetch user repositories from GitHub API
+    // Add authorization if token is available
+    if (env.GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+    }
+
+    // Use authenticated endpoint to fetch ALL repos (personal + org + private if token has access)
     const reposResponse = await fetch(
-      `https://api.github.com/users/${username}/repos?sort=updated&per_page=100&type=public`,
+      `https://api.github.com/user/repos?affiliation=owner,collaborator,organization_member&sort=updated&per_page=100&visibility=public`,
       { headers }
     );
 
@@ -44,30 +48,17 @@ export async function GET(request: Request) {
       );
     }
 
-    const userRepos = await reposResponse.json();
+    // Get all repos (personal, org, collaborator) in one call
+    const allRepos = await reposResponse.json();
 
-    // Fetch repositories from organizations where user has access (using authenticated endpoint)
-    const orgReposResponse = await fetch(
-      `https://api.github.com/user/repos?affiliation=owner,collaborator,organization_member&sort=updated&per_page=100`,
-      { headers }
-    );
-
-    let orgRepos: GitHubRepo[] = [];
-    if (orgReposResponse.ok) {
-      const allUserRepos = await orgReposResponse.json();
-      // Filter only organization repositories
-      orgRepos = allUserRepos.filter(
-        (repo: GitHubRepo) => repo.owner?.type === "Organization"
-      );
-    }
-
-    // Combine user repos and organization repos
-    const allRepos = [...userRepos, ...orgRepos];
-
-    // Remove duplicates based on repo ID
-    const uniqueRepos = allRepos.filter(
-      (repo, index, self) => index === self.findIndex((r) => r.id === repo.id)
-    );
+    // Deduplicate repositories by ID (in case same repo appears multiple times)
+    const uniqueRepos = Array.from(
+      new Map(
+        allRepos.map(
+          (repo: GitHubRepo) => [repo.id, repo] as [number, GitHubRepo]
+        )
+      ).values()
+    ) as GitHubRepo[];
 
     // Fetch README and languages for each repository
     const reposWithReadme = await Promise.all(

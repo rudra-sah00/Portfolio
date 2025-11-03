@@ -50,9 +50,19 @@ describe("GeminiAPI", () => {
       expect(api.baseUrl).toContain("gemini");
     });
 
-    it("should store API key", () => {
-      const api = geminiAPI as unknown as { apiKey: string };
-      expect(api.apiKey).toBe(mockApiKey);
+    it("should store API keys", () => {
+      const api = geminiAPI as unknown as { apiKeys: string[] };
+      expect(api.apiKeys).toContain(mockApiKey);
+      expect(api.apiKeys).toHaveLength(1);
+    });
+
+    it("should accept fallback API key", () => {
+      const fallbackKey = "fallback-key";
+      const api = new GeminiAPI(mockApiKey, fallbackKey);
+      const apiWithKeys = api as unknown as { apiKeys: string[] };
+      expect(apiWithKeys.apiKeys).toContain(mockApiKey);
+      expect(apiWithKeys.apiKeys).toContain(fallbackKey);
+      expect(apiWithKeys.apiKeys).toHaveLength(2);
     });
   });
 

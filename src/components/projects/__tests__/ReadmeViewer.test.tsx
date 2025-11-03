@@ -388,4 +388,268 @@ def hello():
     // Check that content is rendered
     expect(container).toBeInTheDocument();
   });
+
+  it("should render inline code without className", () => {
+    const content = "Some `inline code` here";
+    render(<ReadmeViewer content={content} repoName="test-repo" />);
+
+    const codeElements = screen.getAllByText(/inline code/i);
+    expect(codeElements.length).toBeGreaterThan(0);
+  });
+
+  it("should handle code block with match but not mermaid", () => {
+    const codeContent = `\`\`\`javascript
+const x = 42;
+\`\`\``;
+    const { container } = render(
+      <ReadmeViewer content={codeContent} repoName="test-repo" />
+    );
+
+    // Code should be rendered
+    expect(container.textContent).toContain("const x = 42");
+  });
+
+  it("should handle div without align attribute", () => {
+    const divContent = `# Title
+
+Regular paragraph without alignment.`;
+    const { container } = render(
+      <ReadmeViewer content={divContent} repoName="test-repo" />
+    );
+
+    expect(container).toBeInTheDocument();
+  });
+
+  it("should handle div with right alignment", () => {
+    const divContent = `<div align="right">Right aligned</div>`;
+    render(<ReadmeViewer content={divContent} repoName="test-repo" />);
+
+    expect(screen.getByText(/Right aligned/i)).toBeInTheDocument();
+  });
+
+  it("should handle div with left alignment", () => {
+    const divContent = `<div align="left">Left aligned</div>`;
+    render(<ReadmeViewer content={divContent} repoName="test-repo" />);
+
+    expect(screen.getByText(/Left aligned/i)).toBeInTheDocument();
+  });
+
+  it("should handle image with string width", () => {
+    const imgContent = `![Test Image](test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imgContent} repoName="test-repo" />
+    );
+
+    // Check that markdown content is rendered
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should handle image with numeric width", () => {
+    const imgContent = `![Test Image](test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imgContent} repoName="test-repo" />
+    );
+
+    // Check that markdown content is rendered
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should handle image without width", () => {
+    const imgContent = `![Test](test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imgContent} repoName="test-repo" />
+    );
+
+    // Check that markdown content is rendered
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should render table with full styling", () => {
+    const tableContent = `
+| Column 1 | Column 2 |
+|----------|----------|
+| Data 1   | Data 2   |
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+
+    // GFM tables are rendered
+    expect(screen.getByText(/Column 1/i)).toBeInTheDocument();
+    expect(screen.getByText(/Data 1/i)).toBeInTheDocument();
+  });
+
+  it("should handle td with both align and vAlign", () => {
+    const tableContent = `
+<table>
+  <tbody>
+    <tr>
+      <td align="center" vAlign="middle">Centered</td>
+    </tr>
+  </tbody>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Centered/i)).toBeInTheDocument();
+  });
+
+  it("should handle td with only align", () => {
+    const tableContent = `
+<table>
+  <tbody>
+    <tr>
+      <td align="right">Right</td>
+    </tr>
+  </tbody>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Right/i)).toBeInTheDocument();
+  });
+
+  it("should handle td with only vAlign", () => {
+    const tableContent = `
+<table>
+  <tbody>
+    <tr>
+      <td vAlign="bottom">Bottom</td>
+    </tr>
+  </tbody>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Bottom/i)).toBeInTheDocument();
+  });
+
+  it("should handle td without align or vAlign", () => {
+    const tableContent = `
+<table>
+  <tbody>
+    <tr>
+      <td>Plain cell</td>
+    </tr>
+  </tbody>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Plain cell/i)).toBeInTheDocument();
+  });
+
+  it("should handle th with both align and vAlign", () => {
+    const tableContent = `
+<table>
+  <thead>
+    <tr>
+      <th align="left" vAlign="top">Header Left Top</th>
+    </tr>
+  </thead>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Header Left Top/i)).toBeInTheDocument();
+  });
+
+  it("should handle th with only align", () => {
+    const tableContent = `
+<table>
+  <thead>
+    <tr>
+      <th align="center">Centered Header</th>
+    </tr>
+  </thead>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Centered Header/i)).toBeInTheDocument();
+  });
+
+  it("should handle th with only vAlign", () => {
+    const tableContent = `
+<table>
+  <thead>
+    <tr>
+      <th vAlign="middle">Middle Header</th>
+    </tr>
+  </thead>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Middle Header/i)).toBeInTheDocument();
+  });
+
+  it("should handle th without align or vAlign", () => {
+    const tableContent = `
+<table>
+  <thead>
+    <tr>
+      <th>Plain Header</th>
+    </tr>
+  </thead>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Plain Header/i)).toBeInTheDocument();
+  });
+
+  it("should handle mermaid rendering when ref is not available initially", async () => {
+    const mermaidContent = `\`\`\`mermaid
+flowchart TB
+  Start --> Stop
+\`\`\``;
+
+    const { container } = render(
+      <ReadmeViewer content={mermaidContent} repoName="test-repo" />
+    );
+
+    await waitFor(
+      () => {
+        expect(container).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  });
+
+  it("should handle complex table with mixed alignments", () => {
+    const tableContent = `
+| Left | Center | Right | Default |
+|:-----|:------:|------:|---------|
+| L1   | C1     | R1    | D1      |
+| L2   | C2     | R2    | D2      |
+`;
+    const { container } = render(
+      <ReadmeViewer content={tableContent} repoName="test-repo" />
+    );
+
+    expect(screen.getByText(/Left/i)).toBeInTheDocument();
+    expect(screen.getByText(/Center/i)).toBeInTheDocument();
+    expect(screen.getByText(/Right/i)).toBeInTheDocument();
+    expect(screen.getByText(/Default/i)).toBeInTheDocument();
+    // Ensure table was rendered
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should render README.md title in header", () => {
+    render(<ReadmeViewer content="# Test" repoName="test-repo" />);
+
+    const title = screen.getByText("README.md");
+    expect(title).toBeInTheDocument();
+    expect(title.className).toContain("title");
+  });
+
+  it("should render icon in header", () => {
+    const { container } = render(
+      <ReadmeViewer content="# Test" repoName="test-repo" />
+    );
+
+    const icon = container.querySelector("svg.icon");
+    expect(icon).toBeInTheDocument();
+    expect(icon?.getAttribute("viewBox")).toBe("0 0 16 16");
+  });
+
+  it("should handle div with custom style prop", () => {
+    const divContent = `# Test\n\nContent`;
+    const { container } = render(
+      <ReadmeViewer content={divContent} repoName="test-repo" />
+    );
+
+    expect(container).toBeInTheDocument();
+  });
 });

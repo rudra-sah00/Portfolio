@@ -11,12 +11,29 @@ export interface GeminiResponse {
 import { GitHubRepo } from "@/types";
 
 export class GeminiAPI {
-  private apiKey: string;
+  private apiKeys: string[];
+  private currentKeyIndex: number = 0;
   private baseUrl =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(apiKey: string, fallbackApiKey?: string) {
+    this.apiKeys = [apiKey];
+    if (fallbackApiKey) {
+      this.apiKeys.push(fallbackApiKey);
+    }
+  }
+
+  private getCurrentApiKey(): string {
+    return this.apiKeys[this.currentKeyIndex];
+  }
+
+  private switchToNextKey(): boolean {
+    if (this.currentKeyIndex < this.apiKeys.length - 1) {
+      this.currentKeyIndex++;
+      console.log(`Switched to fallback API key ${this.currentKeyIndex + 1}`);
+      return true;
+    }
+    return false;
   }
 
   private generateTechStackAnalysis(repositories: GitHubRepo[]): string {
@@ -253,45 +270,64 @@ Instructions:
 
     const fullPrompt = `${systemPrompt}\n\nUser: ${message}\n\nRudra-B:`;
 
-    try {
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: fullPrompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
+    // Try with current API key, fallback to next if it fails
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < this.apiKeys.length; attempt++) {
+      try {
+        const apiKey = this.getCurrentApiKey();
+        const response = await fetch(`${this.baseUrl}?key=${apiKey}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: fullPrompt,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
+            },
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+
+        const data: GeminiResponse = await response.json();
+
+        if (
+          data.candidates &&
+          data.candidates[0] &&
+          data.candidates[0].content
+        ) {
+          return data.candidates[0].content.parts[0].text;
+        } else {
+          throw new Error("No response from Gemini API");
+        }
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`Gemini API Error with key ${attempt + 1}:`, error);
+
+        // Try next key if available
+        if (!this.switchToNextKey()) {
+          break; // No more keys to try
+        }
       }
-
-      const data: GeminiResponse = await response.json();
-
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        return data.candidates[0].content.parts[0].text;
-      } else {
-        throw new Error("No response from Gemini API");
-      }
-    } catch (error) {
-      console.error("Gemini API Error:", error);
-      return "Sorry, I encountered an error while processing your request. Please try again.";
     }
+
+    // All keys failed
+    console.error("All Gemini API keys failed:", lastError);
+    return "Sorry, I encountered an error while processing your request. Please try again.";
   }
 }

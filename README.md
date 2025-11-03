@@ -12,8 +12,8 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)
 [![CI/CD Pipeline](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/rudra-sah00/Portfolio/actions)
 [![codecov](https://codecov.io/gh/rudra-sah00/Portfolio/branch/main/graph/badge.svg)](https://codecov.io/gh/rudra-sah00/Portfolio)
-![Test Coverage](https://img.shields.io/badge/coverage-82.21%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-278%20passing-success)
+![Test Coverage](https://img.shields.io/badge/coverage-90.66%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-374%20passing-success)
 
 ## ✨ Features
 
@@ -266,20 +266,48 @@ graph TB
    npm install
    ```
 
-3. **Configure GitHub Username**
+3. **Configure Environment Variables**
+
+   Create a `.env.local` file in the root directory:
+
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+   Then add your tokens:
+
+   ```env
+   # Required: GitHub Personal Access Token
+   # Get from: https://github.com/settings/tokens
+   # Scopes: repo, read:org
+   GITHUB_TOKEN=your_github_pat_here
+
+   # Optional: Email configuration for contact form
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   EMAIL_TO=recipient@email.com
+
+   # Optional: Gemini AI for terminal chat
+   GEMINI_API_KEY=your_gemini_api_key
+
+   # Site URL
+   NEXT_PUBLIC_SITE_URL=https://rudrasahoo.live
+   ```
+
+4. **Configure GitHub Username**
    Update the username in `src/components/ProjectsSection.tsx`:
 
    ```typescript
    const username = "your-github-username";
    ```
 
-4. **Start Development Server**
+5. **Start Development Server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open in Browser**
+6. **Open in Browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure

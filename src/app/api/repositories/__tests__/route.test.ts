@@ -1,4 +1,5 @@
 import { GET } from "../route";
+import { env } from "@/lib/env";
 
 // Mock NextRequest
 class MockNextRequest {
@@ -79,7 +80,7 @@ describe("GET /api/repositories", () => {
   });
 
   it("should handle GitHub API errors", async () => {
-    const mockFetch = jest.fn().mockResolvedValueOnce({
+    const mockFetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 404,
       statusText: "Not Found",
@@ -100,7 +101,7 @@ describe("GET /api/repositories", () => {
     expect(data.error).toBe("GitHub API error: 404");
     expect(data.message).toBe("Not Found");
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("https://api.github.com/users/nonexistent/repos"),
+      expect.stringContaining("https://api.github.com/user/repos"),
       expect.objectContaining({
         headers: expect.objectContaining({
           Accept: "application/vnd.github.v3+json",
@@ -166,8 +167,8 @@ describe("GET /api/repositories", () => {
 
   it("should remove duplicate repositories", async () => {
     const duplicateRepos = [
-      { id: 1, name: "repo1", owner: { login: "user" } },
-      { id: 1, name: "repo1", owner: { login: "user" } },
+      { id: 1, name: "repo1", owner: { login: "user", type: "User" } },
+      { id: 1, name: "repo1", owner: { login: "user", type: "User" } },
     ];
 
     (global.fetch as jest.Mock)
@@ -177,9 +178,21 @@ describe("GET /api/repositories", () => {
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => [],
+        json: async () => ({
+          content: Buffer.from("# README").toString("base64"),
+        }),
       })
-      .mockResolvedValue({
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({}),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          content: Buffer.from("# README").toString("base64"),
+        }),
+      })
+      .mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -200,7 +213,7 @@ describe("GET /api/repositories", () => {
       {
         id: 1,
         name: "test-repo",
-        owner: { login: "user" },
+        owner: { login: "user", type: "User" },
       },
     ];
 
@@ -210,10 +223,6 @@ describe("GET /api/repositories", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockRepos,
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -241,7 +250,7 @@ describe("GET /api/repositories", () => {
       {
         id: 1,
         name: "test-repo",
-        owner: { login: "user" },
+        owner: { login: "user", type: "User" },
       },
     ];
 
@@ -249,10 +258,6 @@ describe("GET /api/repositories", () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockRepos,
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
       })
       .mockResolvedValueOnce({
         ok: false,
@@ -323,13 +328,15 @@ describe("GET /api/repositories", () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => [],
+        json: async () => mockOrgRepos,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockOrgRepos,
+        json: async () => ({
+          content: Buffer.from("# Org Repo").toString("base64"),
+        }),
       })
-      .mockResolvedValue({
+      .mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -345,6 +352,11 @@ describe("GET /api/repositories", () => {
   });
 
   it("should use authorization header for GitHub API", async () => {
+    // Mock env to have GITHUB_TOKEN
+    const originalToken = env.GITHUB_TOKEN;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (env as any).GITHUB_TOKEN = "test-token-123";
+
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: async () => [],
@@ -364,5 +376,9 @@ describe("GET /api/repositories", () => {
         }),
       })
     );
+
+    // Restore original token
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (env as any).GITHUB_TOKEN = originalToken;
   });
 });

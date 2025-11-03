@@ -9,8 +9,9 @@ const envSchema = z.object({
   // GitHub API
   GITHUB_TOKEN: z.string().optional(),
 
-  // AI Terminal
+  // AI Terminal - Primary and Fallback API Keys
   GEMINI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY_FALLBACK: z.string().optional(),
 
   // Next.js
   NEXT_PUBLIC_SITE_URL: z.string().url().default("https://rudrasahoo.live"),
