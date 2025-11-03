@@ -623,8 +623,10 @@ const TerminalPopup = ({
   useEffect(() => {
     if (terminalBodyRef.current) {
       const scrollToBottom = () => {
-        terminalBodyRef.current!.scrollTop =
-          terminalBodyRef.current!.scrollHeight;
+        if (terminalBodyRef.current) {
+          terminalBodyRef.current.scrollTop =
+            terminalBodyRef.current.scrollHeight;
+        }
       };
 
       // Use requestAnimationFrame for smooth scrolling
@@ -636,10 +638,12 @@ const TerminalPopup = ({
   useEffect(() => {
     if (terminalBodyRef.current && isTyping) {
       const scrollToBottom = () => {
-        terminalBodyRef.current!.scrollTo({
-          top: terminalBodyRef.current!.scrollHeight,
-          behavior: "smooth",
-        });
+        if (terminalBodyRef.current) {
+          terminalBodyRef.current.scrollTo({
+            top: terminalBodyRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
       };
 
       // Small delay to ensure content is rendered

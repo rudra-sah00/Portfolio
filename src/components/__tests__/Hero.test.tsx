@@ -35,6 +35,15 @@ describe("Hero Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock requestAnimationFrame for tests
+    jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      cb(0);
+      return 0;
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("should render hero section", () => {
