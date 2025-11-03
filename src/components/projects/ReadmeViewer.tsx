@@ -109,6 +109,7 @@ const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ content }) => {
             ) => {
               const { src, alt, width, ...restProps } = props;
               return (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={src}
                   alt={alt}

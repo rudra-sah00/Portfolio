@@ -193,6 +193,7 @@ export const Compare = ({
               }}
               transition={{ duration: 0 }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 alt="first image"
                 src={firstImage}

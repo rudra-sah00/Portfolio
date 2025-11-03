@@ -33,13 +33,34 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          echo "Running ESLint..."
+          npm run lint
+          if [ $? -ne 0 ]; then
+            echo "❌ ESLint check failed!"
+            exit 1
+          fi
+          echo "✅ ESLint passed"
 
       - name: Run Prettier check
-        run: npm run format:check
+        run: |
+          echo "Running Prettier check..."
+          npm run format:check
+          if [ $? -ne 0 ]; then
+            echo "❌ Prettier check failed!"
+            exit 1
+          fi
+          echo "✅ Prettier check passed"
 
       - name: Run type check
-        run: npm run type-check
+        run: |
+          echo "Running TypeScript type check..."
+          npm run type-check
+          if [ $? -ne 0 ]; then
+            echo "❌ Type check failed!"
+            exit 1
+          fi
+          echo "✅ Type check passed"
 
   test:
     name: Test & Coverage
@@ -63,7 +84,51 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: |
+          echo "Running tests with coverage..."
+          npm run test:coverage
+          if [ $? -ne 0 ]; then
+            echo "❌ Tests failed!"
+            exit 1
+          fi
+          echo "✅ All tests passed"
+
+      - name: Check coverage thresholds
+        run: |
+          echo "Checking coverage thresholds..."
+          node -e "
+          const coverage = require('./coverage/coverage-summary.json');
+          const total = coverage.total;
+          const thresholds = {
+            statements: 80,
+            branches: 70,
+            functions: 68,
+            lines: 80
+          };
+
+          let failed = false;
+          Object.keys(thresholds).forEach(key => {
+            const actual = total[key].pct;
+            const required = thresholds[key];
+            if (actual < required) {
+              console.log(\`❌ ${key}: ${actual.toFixed(2)}% < ${required}% (threshold)\`);
+              failed = true;
+            } else {
+              console.log(\`✅ ${key}: ${actual.toFixed(2)}% >= ${required}%\`);
+            }
+          });
+
+          if (failed) {
+            console.log('\\n❌ Coverage thresholds not met!');
+            process.exit(1);
+          } else {
+            console.log('\\n✅ All coverage thresholds met!');
+          }
+          "
+          if [ $? -ne 0 ]; then
+            echo "❌ Coverage check failed!"
+            exit 1
+          fi
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -139,7 +204,14 @@ jobs:
         run: npm ci
 
       - name: Build application
-        run: npm run build
+        run: |
+          echo "Building Next.js application..."
+          npm run build
+          if [ $? -ne 0 ]; then
+            echo "❌ Build failed!"
+            exit 1
+          fi
+          echo "✅ Build successful"
         env:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://rudrasahoo.live' }}
 
@@ -163,8 +235,17 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run security audit
-        run: npm audit --audit-level=moderate
+        run: |
+          echo "Running npm security audit..."
+          npm audit --audit-level=moderate
+          if [ $? -ne 0 ]; then
+            echo "⚠️ Security vulnerabilities found!"
+            echo "Note: This won't block deployment but should be reviewed"
+          fi
         continue-on-error: true
 
       - name: Check for outdated packages
@@ -178,7 +259,7 @@ jobs:
     # 2. All tests and checks passed
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [lint-and-type-check, test, build, security-audit]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -189,7 +270,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+          vercel-args: "--prod"
           working-directory: ./
 
       - name: Comment deployment success
@@ -211,7 +292,7 @@ jobs:
     # Deploy preview for PRs after all checks pass
     if: github.event_name == 'pull_request'
     needs: [lint-and-type-check, test, build, security-audit]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
