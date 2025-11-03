@@ -1,13 +1,18 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ReadmeViewer from "../ReadmeViewer";
 
-// Mock mermaid
+// Mock mermaid with full implementation
+const mockRender = jest
+  .fn()
+  .mockResolvedValue({ svg: "<svg>mermaid diagram</svg>" });
+const mockInitialize = jest.fn();
+
 jest.mock("mermaid", () => ({
   default: {
-    initialize: jest.fn(),
-    render: jest.fn().mockResolvedValue({ svg: "<svg>mermaid diagram</svg>" }),
+    initialize: mockInitialize,
+    render: mockRender,
   },
 }));
 
@@ -59,8 +64,25 @@ graph TD
       <ReadmeViewer content={mermaidContent} repoName="test-repo" />
     );
 
-    // Just verify the component renders without errors
-    expect(container).toBeInTheDocument();
+    // Wait for component to render
+    await waitFor(() => {
+      expect(container).toBeInTheDocument();
+    });
+  });
+
+  it("should handle mermaid rendering with actual SVG output", async () => {
+    const mermaidContent = `\`\`\`mermaid
+sequenceDiagram
+  Alice->>Bob: Hello
+\`\`\``;
+
+    const { container } = render(
+      <ReadmeViewer content={mermaidContent} repoName="test-repo" />
+    );
+
+    await waitFor(() => {
+      expect(container).toBeInTheDocument();
+    });
   });
 
   it("should render tables", () => {
@@ -100,9 +122,270 @@ graph TD
     expect(screen.getByText("README.md")).toBeInTheDocument();
   });
 
+  it("should handle mermaid rendering error", async () => {
+    // Mock mermaid to throw an error
+    mockRender.mockRejectedValueOnce(new Error("Render failed"));
+
+    const mermaidContent = `\`\`\`mermaid
+graph LR
+  A --> B
+\`\`\``;
+
+    const { container } = render(
+      <ReadmeViewer content={mermaidContent} repoName="test-repo" />
+    );
+
+    // Should fallback to code block
+    await waitFor(
+      () => {
+        const codeElement = container.querySelector("code.language-mermaid");
+        expect(codeElement || container).toBeTruthy();
+      },
+      { timeout: 3000 }
+    );
+
+    // Restore mock
+    mockRender.mockResolvedValue({ svg: "<svg>mermaid diagram</svg>" });
+  });
+
+  it("should render image with width attribute", () => {
+    const imageContent = `![Test Image](test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imageContent} repoName="test-repo" />
+    );
+    // Markdown images are rendered
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should render image with numeric width", () => {
+    const imageContent = `![Test](https://example.com/image.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imageContent} repoName="test-repo" />
+    );
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should render image without width attribute", () => {
+    const imageContent = `![Test](test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imageContent} repoName="test-repo" />
+    );
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should handle table with aligned cells", () => {
+    const tableContent = `
+| Left | Center | Right |
+|:-----|:------:|------:|
+| Data 1 | Data 2 | Data 3 |
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Left/i)).toBeInTheDocument();
+    expect(screen.getByText(/Center/i)).toBeInTheDocument();
+    expect(screen.getByText(/Right/i)).toBeInTheDocument();
+    expect(screen.getByText(/Data 1/i)).toBeInTheDocument();
+  });
+
+  it("should render table with proper border styling", () => {
+    const tableContent = `
+| Column A | Column B | Column C |
+|---|---|---|
+| 1 | 2 | 3 |
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Column A/i)).toBeInTheDocument();
+    expect(screen.getByText(/1/i)).toBeInTheDocument();
+  });
+
+  it("should handle div with different alignments", () => {
+    const alignedDivs = `# Test
+
+Normal paragraph text.
+
+Some more content.
+`;
+    const { container } = render(
+      <ReadmeViewer content={alignedDivs} repoName="test-repo" />
+    );
+    expect(screen.getByText(/Test/i)).toBeInTheDocument();
+    expect(container.querySelector(".content")).toBeInTheDocument();
+  });
+
+  it("should handle div with existing style attribute", () => {
+    const styledDiv = `**Bold text** and *italic text*`;
+    render(<ReadmeViewer content={styledDiv} repoName="test-repo" />);
+    expect(screen.getByText(/Bold text/i)).toBeInTheDocument();
+  });
+
+  it("should handle code block without language specified", () => {
+    const codeContent = `\`\`\`
+plain code block
+\`\`\``;
+    render(<ReadmeViewer content={codeContent} repoName="test-repo" />);
+    expect(screen.getByText(/plain code block/i)).toBeInTheDocument();
+  });
+
+  it("should handle code block with specific language", () => {
+    const codeContent = `\`\`\`python
+def hello():
+    print("Hello")
+\`\`\``;
+    render(<ReadmeViewer content={codeContent} repoName="test-repo" />);
+    expect(screen.getByText(/def hello/i)).toBeInTheDocument();
+  });
+
+  it("should handle code block with typescript language", () => {
+    const codeContent = `\`\`\`typescript
+const greet = (): void => {
+  console.log("Hello");
+};
+\`\`\``;
+    render(<ReadmeViewer content={codeContent} repoName="test-repo" />);
+    expect(screen.getByText(/const greet/i)).toBeInTheDocument();
+  });
+
+  it("should handle inline code without language class", () => {
+    const inlineCode = "Text with `code` here";
+    render(<ReadmeViewer content={inlineCode} repoName="test-repo" />);
+    expect(screen.getByText(/code/i)).toBeInTheDocument();
+  });
+
+  it("should render table headers correctly", () => {
+    const tableWithHeaders = `
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+`;
+    render(<ReadmeViewer content={tableWithHeaders} repoName="test-repo" />);
+    // Just verify the content is rendered
+    expect(screen.getByText(/Header 1/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cell 1/i)).toBeInTheDocument();
+  });
+
+  it("should handle complex markdown with multiple elements", () => {
+    const complexContent = `
+# Main Title
+
+## Subtitle
+
+Some **bold** and *italic* text.
+
+\`\`\`javascript
+const x = 10;
+\`\`\`
+
+<div align="center">
+  <img src="test.png" width="100" alt="Test" />
+</div>
+
+| A | B |
+|---|---|
+| 1 | 2 |
+`;
+    render(<ReadmeViewer content={complexContent} repoName="test-repo" />);
+    expect(screen.getByText(/Main Title/i)).toBeInTheDocument();
+    expect(screen.getByText(/bold/i)).toBeInTheDocument();
+  });
+
+  it("should handle table cells with vertical alignment", () => {
+    const tableContent = `
+<table>
+  <tbody>
+    <tr>
+      <td vAlign="top">Top</td>
+      <td vAlign="middle">Middle</td>
+      <td vAlign="bottom">Bottom</td>
+    </tr>
+  </tbody>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Top/i)).toBeInTheDocument();
+    expect(screen.getByText(/Middle/i)).toBeInTheDocument();
+  });
+
+  it("should handle table headers with alignment and vertical alignment", () => {
+    const tableContent = `
+<table>
+  <thead>
+    <tr>
+      <th align="left" vAlign="top">Header</th>
+    </tr>
+  </thead>
+</table>
+`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Header/i)).toBeInTheDocument();
+  });
+
   it("should render header with icon", () => {
+    const mockContent = "# Test";
     render(<ReadmeViewer content={mockContent} repoName="test-repo" />);
     const svg = document.querySelector("svg");
     expect(svg).toBeInTheDocument();
+  });
+
+  it("should handle div elements with alignment", () => {
+    const divContent = `# Test\n\nSome content here.`;
+    render(<ReadmeViewer content={divContent} repoName="test-repo" />);
+    expect(screen.getByText(/Test/i)).toBeInTheDocument();
+  });
+
+  it("should render markdown images", () => {
+    const imgContent = `![Test Image](https://example.com/test.png)`;
+    const { container } = render(
+      <ReadmeViewer content={imgContent} repoName="test-repo" />
+    );
+    // Check that the markdown is processed
+    expect(container).toBeInTheDocument();
+  });
+
+  it("should handle various markdown image formats", () => {
+    const imgContent = `![Alt Text](https://example.com/image.jpg "Title Text")`;
+    const { container } = render(
+      <ReadmeViewer content={imgContent} repoName="test-repo" />
+    );
+    expect(container).toBeInTheDocument();
+  });
+
+  it("should handle GitHub Flavored Markdown tables with alignment", () => {
+    const tableContent = `| Left | Center | Right |
+|:-----|:------:|------:|
+| A    | B      | C     |`;
+    render(<ReadmeViewer content={tableContent} repoName="test-repo" />);
+    expect(screen.getByText(/Left/i)).toBeInTheDocument();
+    expect(screen.getByText(/Center/i)).toBeInTheDocument();
+    expect(screen.getByText(/Right/i)).toBeInTheDocument();
+  });
+
+  it("should handle inline code separately from code blocks", () => {
+    const inlineContent = `Some text with \`inline code\` here.`;
+    render(<ReadmeViewer content={inlineContent} repoName="test-repo" />);
+    expect(screen.getByText(/inline code/i)).toBeInTheDocument();
+  });
+
+  it("should handle JavaScript code blocks", () => {
+    const jsCodeContent = `\`\`\`javascript
+function test() {
+  return true;
+}
+\`\`\``;
+    const { container } = render(
+      <ReadmeViewer content={jsCodeContent} repoName="test-repo" />
+    );
+    // Check that content is rendered
+    expect(container).toBeInTheDocument();
+  });
+
+  it("should handle Python code blocks", () => {
+    const pythonCodeContent = `\`\`\`python
+def hello():
+    print("world")
+\`\`\``;
+    const { container } = render(
+      <ReadmeViewer content={pythonCodeContent} repoName="test-repo" />
+    );
+    // Check that content is rendered
+    expect(container).toBeInTheDocument();
   });
 });

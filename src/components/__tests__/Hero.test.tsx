@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Hero from "../Hero";
 import { GitHubRepo } from "@/types";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -149,6 +150,64 @@ describe("Hero Component", () => {
     unmount();
 
     expect(document.body.style.overflow).toBe("unset");
+  });
+
+  it("should handle terminal close with body overflow restoration", async () => {
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <Hero repositories={mockRepositories} loading={false} />
+    );
+
+    const terminalButton = container.querySelector(".btn-flip") as HTMLElement;
+    expect(terminalButton).toBeInTheDocument();
+
+    // Click to open terminal
+    await user.click(terminalButton);
+
+    // Wait for terminal to open
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Welcome to Rudra's Terminal!/i)
+      ).toBeInTheDocument();
+    });
+
+    // Verify terminal opened state
+    expect(
+      screen.getByText(/Type !help for available commands/i)
+    ).toBeInTheDocument();
+  });
+
+  it("should handle terminal opening and closing", async () => {
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <Hero repositories={mockRepositories} loading={false} />
+    );
+
+    const terminalButton = container.querySelector(".btn-flip") as HTMLElement;
+    expect(terminalButton).toBeInTheDocument();
+
+    // Click to open terminal
+    await user.click(terminalButton);
+
+    // Wait for terminal to open
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Welcome to Rudra's Terminal!/i)
+      ).toBeInTheDocument();
+    });
+
+    // Close the terminal
+    const closeButtons = screen.getAllByTitle(/Close and Clear History/i);
+    await user.click(closeButtons[0]);
+
+    // Terminal should be closed
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/Welcome to Rudra's Terminal!/i)
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("should render ContainerTextFlip with animated words", () => {

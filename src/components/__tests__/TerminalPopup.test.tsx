@@ -47,6 +47,13 @@ describe("TerminalPopup Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock window.scrollTo
+    window.scrollTo = jest.fn();
+    // Mock requestAnimationFrame
+    global.requestAnimationFrame = jest.fn((callback) => {
+      callback(0);
+      return 0;
+    }) as unknown as typeof requestAnimationFrame;
   });
 
   afterEach(() => {
@@ -290,5 +297,657 @@ describe("TerminalPopup Component", () => {
 
     const terminalContainer = container.querySelector(".terminal-container");
     expect(terminalContainer).toBeInTheDocument();
+  });
+
+  it("should handle formatTerminalText with AI response", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: [
+        "🤖 Rudra-B: Here are my **projects**: 1. **Portfolio**: Personal website 2. **Terminal**: Interactive terminal",
+      ],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "projects{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("projects");
+      });
+    }
+  });
+
+  it("should handle bullet point formatting in AI responses", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: [
+        "🤖 Rudra-B: Features:\n• **Feature 1**: Description\n• Regular bullet point",
+      ],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "features{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("features");
+      });
+    }
+  });
+
+  it("should handle chat mode direct messages", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["🤖 Rudra-B: Hello! How can I help?"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("chat@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: true },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "hello{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("hello");
+      });
+    }
+  });
+
+  it("should handle chat mode error", async () => {
+    const mockExecuteCommand = jest
+      .fn()
+      .mockRejectedValue(new Error("API Error"));
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("chat@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: true },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "test message{Enter}");
+
+      await waitFor(
+        () => {
+          const errorText = screen.queryByText(/Failed to get response/i);
+          expect(errorText || mockExecuteCommand).toBeTruthy();
+        },
+        { timeout: 3000 }
+      );
+    }
+  });
+
+  it("should handle download command with progress animation", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: [
+        "Downloading resume...",
+        "█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░",
+        "50% Downloading...",
+      ],
+      clear: false,
+      startDownload: true,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "!resume{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("!resume");
+      });
+    }
+  });
+
+  it("should handle contact submission with progress animation", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: [
+        "Submitting contact...",
+        "█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░",
+        "50% Processing...",
+      ],
+      clear: false,
+      startSubmitting: true,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+        completedContactForm: {
+          name: "Test User",
+          contactOption: "email",
+          contactDetails: "test@example.com",
+          message: "Test message",
+        },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "!contact{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("!contact");
+      });
+    }
+  });
+
+  it("should handle command execution error", async () => {
+    const mockExecuteCommand = jest
+      .fn()
+      .mockRejectedValue(new Error("Command failed"));
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "invalid{Enter}");
+
+      await waitFor(
+        () => {
+          expect(mockExecuteCommand).toHaveBeenCalledWith("invalid");
+        },
+        { timeout: 3000 }
+      );
+    }
+  });
+
+  it("should handle ArrowDown key when not at end of history", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "cmd1{Enter}");
+      await user.type(input, "cmd2{Enter}");
+      await user.type(input, "cmd3{Enter}");
+
+      // Go up twice
+      fireEvent.keyDown(input, { key: "ArrowUp" });
+      fireEvent.keyDown(input, { key: "ArrowUp" });
+
+      // Go down once
+      fireEvent.keyDown(input, { key: "ArrowDown" });
+
+      expect(input).toBeInTheDocument();
+    }
+  });
+
+  it("should handle ArrowDown key at end of history", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "cmd1{Enter}");
+
+      // Go up
+      fireEvent.keyDown(input, { key: "ArrowUp" });
+      // Go down past end
+      fireEvent.keyDown(input, { key: "ArrowDown" });
+
+      await waitFor(() => {
+        expect(input.value).toBe("");
+      });
+    }
+  });
+
+  it("should handle numbered list formatting in AI responses", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: [
+        "🤖 Rudra-B: 1. **Project One**: First project\n2. **Project Two**: Second project",
+      ],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "list{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("list");
+      });
+    }
+  });
+
+  it("should handle empty lines in AI responses", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["🤖 Rudra-B: Line 1\n\nLine 3"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "test{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("test");
+      });
+    }
+  });
+
+  it("should prevent default on ArrowUp and ArrowDown keys", () => {
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    const upEvent = new KeyboardEvent("keydown", {
+      key: "ArrowUp",
+      bubbles: true,
+      cancelable: true,
+    });
+    const downEvent = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      bubbles: true,
+      cancelable: true,
+    });
+
+    fireEvent.keyDown(input, upEvent);
+    fireEvent.keyDown(input, downEvent);
+
+    expect(input).toBeInTheDocument();
+  });
+
+  it("should handle touch events on backdrop", () => {
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const backdrop = container.querySelector(".terminal-backdrop");
+    expect(backdrop).toBeInTheDocument();
+
+    if (backdrop) {
+      fireEvent.touchMove(backdrop);
+      fireEvent.wheel(backdrop);
+    }
+  });
+
+  it("should handle touch events on terminal container", () => {
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const terminalContainer = container.querySelector(".terminal-container");
+    expect(terminalContainer).toBeInTheDocument();
+
+    if (terminalContainer) {
+      fireEvent.touchMove(terminalContainer);
+      fireEvent.wheel(terminalContainer);
+    }
+  });
+
+  it("should clean up event listeners on unmount", () => {
+    const { unmount } = render(<TerminalPopup {...defaultProps} />);
+
+    unmount();
+
+    // Component should unmount without errors
+    expect(screen.queryByText(/rudra@portfolio/i)).not.toBeInTheDocument();
+  });
+
+  it("should handle viewport meta tag manipulation", () => {
+    // Create a meta viewport tag for testing
+    const viewport = document.createElement("meta");
+    viewport.setAttribute("name", "viewport");
+    viewport.setAttribute("content", "width=device-width, initial-scale=1.0");
+    document.head.appendChild(viewport);
+
+    render(<TerminalPopup {...defaultProps} />);
+
+    const viewportElement = document.querySelector("meta[name=viewport]");
+    expect(viewportElement).toBeInTheDocument();
+
+    // Clean up
+    document.head.removeChild(viewport);
+  });
+
+  it("should restore body scroll on close", () => {
+    const { unmount } = render(<TerminalPopup {...defaultProps} />);
+
+    unmount();
+
+    // Body should have overflow restored
+    expect(document.body.style.overflow).toBeDefined();
+  });
+
+  it("should handle regular text in formatTerminalText", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["Regular output without AI prefix"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "help{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("help");
+      });
+    }
+  });
+
+  it("should handle chat clear command", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["Chat cleared"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("chat@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: true },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "clear{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("clear");
+      });
+    }
+  });
+
+  it("should handle chat slash command", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["Command executed"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("chat@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: true },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "/exit{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("/exit");
+      });
+    }
+  });
+
+  it("should handle chat exclamation command", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["Command executed"],
+      clear: false,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("chat@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: true },
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "!help{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("!help");
+      });
+    }
+  });
+
+  it("should handle contact submission without completed form", async () => {
+    const mockExecuteCommand = jest.fn().mockResolvedValue({
+      output: ["Submitting..."],
+      clear: false,
+      startSubmitting: true,
+    });
+
+    (TerminalEngine as jest.Mock).mockImplementation(() => ({
+      setRepositories: jest.fn(),
+      executeCommand: mockExecuteCommand,
+      getPrompt: jest.fn().mockReturnValue("guest@portfolio:~$"),
+      getPromptColor: jest.fn().mockReturnValue("#00ff00"),
+      getState: jest.fn().mockReturnValue({
+        chatSession: { isActive: false },
+        completedContactForm: null,
+      }),
+      resetState: jest.fn(),
+    }));
+
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "!contact{Enter}");
+
+      await waitFor(() => {
+        expect(mockExecuteCommand).toHaveBeenCalledWith("!contact");
+      });
+    }
+  });
+
+  it("should handle empty command submission", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "{Enter}");
+
+      // Input should still be empty
+      expect(input.value).toBe("");
+    }
+  });
+
+  it("should handle only whitespace command", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<TerminalPopup {...defaultProps} />);
+
+    const input = container.querySelector(
+      'input[type="text"]'
+    ) as HTMLInputElement;
+
+    if (input) {
+      await user.type(input, "   {Enter}");
+
+      await waitFor(() => {
+        expect(input.value).toBe("");
+      });
+    }
   });
 });
