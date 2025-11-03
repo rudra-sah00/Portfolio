@@ -137,4 +137,174 @@ describe("useScrollAnimation Hook", () => {
       expect.any(Function)
     );
   });
+
+  it("should handle scroll events and activate sections", () => {
+    const mockSections = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    const mockReadmeContents = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    (document.querySelectorAll as jest.Mock)
+      .mockReturnValueOnce(mockSections)
+      .mockReturnValueOnce(mockReadmeContents);
+
+    Object.defineProperty(window, "scrollY", { value: 100, writable: true });
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    renderHook(() => useScrollAnimation(mockRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+
+    // Simulate scroll event
+    scrollHandler();
+
+    expect(mockSections[0].classList.add).toHaveBeenCalledWith("is-1");
+  });
+
+  it("should return early when repositories array is empty during scroll", () => {
+    Object.defineProperty(window, "scrollY", { value: 100, writable: true });
+
+    renderHook(() => useScrollAnimation([]));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+
+    // Should not throw when scrolling with empty repos
+    expect(() => scrollHandler()).not.toThrow();
+  });
+
+  it("should update GitHub button href on scroll", () => {
+    const mockButton = { href: "" };
+    const mockSections = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    (document.querySelectorAll as jest.Mock).mockReturnValue(mockSections);
+    (document.querySelector as jest.Mock).mockReturnValue(mockButton);
+
+    Object.defineProperty(window, "scrollY", { value: 100, writable: true });
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    renderHook(() => useScrollAnimation(mockRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+    scrollHandler();
+
+    expect(mockButton.href).toBe(mockRepos[0].html_url);
+  });
+
+  it("should handle scroll past last section", () => {
+    const mockSections = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    const mockReadmeContents = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    (document.querySelectorAll as jest.Mock)
+      .mockReturnValueOnce(mockSections)
+      .mockReturnValueOnce(mockReadmeContents);
+
+    Object.defineProperty(window, "scrollY", {
+      value: 5000,
+      writable: true,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    renderHook(() => useScrollAnimation(mockRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+    scrollHandler();
+
+    expect(mockSections[1].classList.add).toHaveBeenCalledWith("is-1");
+    expect(mockReadmeContents[1].classList.add).toHaveBeenCalledWith("is-1");
+  });
+
+  it("should remove is-1 from non-last sections when scrolling", () => {
+    const mockSections = [
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+      { classList: { add: jest.fn(), remove: jest.fn() } },
+    ];
+
+    (document.querySelectorAll as jest.Mock).mockReturnValue(mockSections);
+
+    Object.defineProperty(window, "scrollY", {
+      value: 1500,
+      writable: true,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    const threeRepos = [...mockRepos, { ...mockRepos[0], id: 3 }];
+    renderHook(() => useScrollAnimation(threeRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+    scrollHandler();
+
+    expect(mockSections[0].classList.remove).toHaveBeenCalledWith("is-1");
+  });
+
+  it("should handle different window heights for few repositories", () => {
+    const fewRepos = mockRepos.slice(0, 1);
+
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    renderHook(() => useScrollAnimation(fewRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+
+    // Should calculate window height with +550 for <=5 repos
+    expect(() => scrollHandler()).not.toThrow();
+  });
+
+  it("should handle different window heights for many repositories", () => {
+    const manyRepos = Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      name: `repo${i}`,
+      description: `Repo ${i}`,
+      html_url: `https://github.com/user/repo${i}`,
+    }));
+
+    Object.defineProperty(window, "innerHeight", {
+      value: 800,
+      writable: true,
+    });
+
+    renderHook(() => useScrollAnimation(manyRepos));
+
+    const scrollHandler = (document.addEventListener as jest.Mock).mock
+      .calls[0][1];
+
+    // Should calculate window height with +400 for >5 repos
+    expect(() => scrollHandler()).not.toThrow();
+  });
 });
