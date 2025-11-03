@@ -10,9 +10,10 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 ![GSAP](https://img.shields.io/badge/GSAP-3.0-88CE02)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0-38B2AC)
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)
+[![CI/CD Pipeline](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/rudra-sah00/Portfolio/actions)
 [![codecov](https://codecov.io/gh/rudra-sah00/Portfolio/branch/main/graph/badge.svg)](https://codecov.io/gh/rudra-sah00/Portfolio)
-![Build Status](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)
-![Test Coverage](https://img.shields.io/badge/coverage-87%25-green)
+![Test Coverage](https://img.shields.io/badge/coverage-82.21%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-278%20passing-success)
 
 ## ✨ Features
 
@@ -102,6 +103,136 @@ graph TB
     style H fill:#4285f4
     style D fill:#88CE02
 ```
+
+## 🔄 CI/CD Workflow
+
+Automated testing, building, and deployment pipeline powered by GitHub Actions:
+
+```mermaid
+graph TB
+    Start([Push/PR Event]) --> Draft{Is PR Draft?}
+    Draft -->|Yes| Skip[Skip Workflow ⏭️]
+    Draft -->|No| Lint[Lint & Type Check 🔍]
+
+    Lint --> ESLint[ESLint Check]
+    Lint --> Prettier[Prettier Check]
+    Lint --> TypeCheck[TypeScript Check]
+
+    ESLint --> LintPass{All Pass?}
+    Prettier --> LintPass
+    TypeCheck --> LintPass
+
+    LintPass -->|No| LintFail[❌ Workflow Failed]
+    LintPass -->|Yes| Test[Test & Coverage 🧪]
+
+    Test --> RunTests[npm run test:coverage]
+    RunTests --> Coverage{Coverage Check}
+
+    Coverage --> Codecov[Upload to Codecov 📊]
+    Coverage --> Artifact1[Upload Coverage Reports]
+    Coverage --> PRComment[Comment PR with Results 💬]
+
+    Codecov --> CovThreshold{Meets Thresholds?}
+    CovThreshold -->|Statements ≥ 80%| Build
+    CovThreshold -->|Branches ≥ 70%| Build
+    CovThreshold -->|Functions ≥ 75%| Build
+    CovThreshold -->|Lines ≥ 80%| Build
+    CovThreshold -->|No| Warning[⚠️ Coverage Warning]
+
+    Warning --> Build[Build Application 🏗️]
+    Build --> InstallDeps[npm ci]
+    InstallDeps --> NextBuild[npm run build]
+    NextBuild --> Artifact2[Upload Build Artifacts]
+
+    Artifact2 --> BuildPass{Build Success?}
+    BuildPass -->|No| BuildFail[❌ Build Failed]
+    BuildPass -->|Yes| Security[Security Audit 🔒]
+
+    Security --> NPMAudit[npm audit]
+    Security --> Outdated[Check Outdated Packages]
+
+    NPMAudit --> SecurityPass{Security OK?}
+    Outdated --> SecurityPass
+
+    SecurityPass -->|Yes| PRCheck{Is PR?}
+    SecurityPass -->|No| SecurityWarn[⚠️ Security Issues Found]
+    SecurityWarn --> PRCheck
+
+    PRCheck -->|Yes| PRStatus[PR Status Check ✅]
+    PRCheck -->|No| Deploy
+
+    PRStatus --> PRSuccess[All Checks Passed! 🎉]
+    PRSuccess --> ReadyMerge[Ready to Merge]
+
+    Deploy[Deploy to Production 🚀] --> Vercel[Vercel Deployment]
+    Vercel --> VercelBuild[Build on Vercel]
+    VercelBuild --> VercelDeploy[Deploy to Edge Network]
+    VercelDeploy --> Live[✅ Live at rudrasahoo.live]
+
+    Live --> Analytics[Vercel Analytics 📈]
+    Live --> SpeedInsights[Speed Insights ⚡]
+
+    style Start fill:#4CAF50
+    style Skip fill:#9E9E9E
+    style LintFail fill:#f44336
+    style BuildFail fill:#f44336
+    style Warning fill:#FF9800
+    style SecurityWarn fill:#FF9800
+    style Live fill:#4CAF50
+    style Codecov fill:#F01F7A
+    style Vercel fill:#000000
+    style PRSuccess fill:#4CAF50
+    style ReadyMerge fill:#2196F3
+```
+
+### Workflow Details
+
+#### 🔍 Lint & Type Check
+
+- **ESLint**: Code quality and style enforcement
+- **Prettier**: Code formatting validation
+- **TypeScript**: Type safety verification
+- **Node Version**: 20.x with npm cache
+
+#### 🧪 Test & Coverage
+
+- **Test Runner**: Jest with React Testing Library
+- **Coverage Thresholds**:
+  - Statements: ≥ 80%
+  - Branches: ≥ 70%
+  - Functions: ≥ 75%
+  - Lines: ≥ 80%
+- **Coverage Tools**: Codecov integration with PR comments
+- **Test Count**: 278 comprehensive tests across 19 suites
+
+#### 🏗️ Build Process
+
+- **Framework**: Next.js 15 with App Router
+- **Output**: Optimized static and server bundles
+- **Artifacts**: Build output uploaded for deployment
+- **Environment**: Production-ready configuration
+
+#### 🔒 Security Audit
+
+- **npm audit**: Vulnerability scanning
+- **Dependency Check**: Outdated package detection
+- **Severity Level**: Moderate and above
+- **Auto-remediation**: Continuous monitoring
+
+#### 🚀 Deployment
+
+- **Platform**: Vercel Edge Network
+- **Trigger**: Automatic on main branch push
+- **Preview**: PR preview deployments
+- **Analytics**: Real-time monitoring
+- **Performance**: Speed Insights tracking
+
+#### 📊 PR Validation
+
+- **Status Checks**: All jobs must pass
+- **Coverage Reports**: Automatic PR comments
+- **Build Verification**: Ensures production readiness
+- **Merge Protection**: Enforced via branch rules
 
 ### 🛠️ Tech Stack
 

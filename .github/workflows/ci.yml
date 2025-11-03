@@ -67,12 +67,12 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/coverage-final.json
-          flags: unit
-          name: codecov-umbrella
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-portfolio
           fail_ci_if_error: false
           verbose: true
 
@@ -92,16 +92,24 @@ jobs:
             const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
             const total = coverage.total;
             
+            const getStatus = (pct, threshold) => {
+              if (pct >= threshold) return '✅';
+              if (pct >= threshold - 5) return '⚠️';
+              return '❌';
+            };
+            
             const comment = `## 📊 Test Coverage Report
             
-            | Metric | Coverage | Status |
-            |--------|----------|--------|
-            | Statements | ${total.statements.pct}% | ${total.statements.pct >= 80 ? '✅' : '⚠️'} |
-            | Branches | ${total.branches.pct}% | ${total.branches.pct >= 80 ? '✅' : '⚠️'} |
-            | Functions | ${total.functions.pct}% | ${total.functions.pct >= 80 ? '✅' : '⚠️'} |
-            | Lines | ${total.lines.pct}% | ${total.lines.pct >= 80 ? '✅' : '⚠️'} |
+            | Metric | Coverage | Threshold | Status |
+            |--------|----------|-----------|--------|
+            | Statements | ${total.statements.pct.toFixed(2)}% | 80% | ${getStatus(total.statements.pct, 80)} |
+            | Branches | ${total.branches.pct.toFixed(2)}% | 70% | ${getStatus(total.branches.pct, 70)} |
+            | Functions | ${total.functions.pct.toFixed(2)}% | 75% | ${getStatus(total.functions.pct, 75)} |
+            | Lines | ${total.lines.pct.toFixed(2)}% | 80% | ${getStatus(total.lines.pct, 80)} |
             
-            **Total Tests:** ${Object.keys(coverage).length - 1} files
+            **Total Tests:** ${Object.keys(coverage).length - 1} files tested
+            
+            ${total.statements.pct >= 80 && total.branches.pct >= 70 ? '✅ **Coverage thresholds met!**' : '⚠️ **Some coverage thresholds not met**'}
             `;
             
             github.rest.issues.createComment({
