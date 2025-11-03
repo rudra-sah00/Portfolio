@@ -96,8 +96,8 @@ jobs:
       - name: Check coverage thresholds
         run: |
           echo "Checking coverage thresholds..."
-          node -e "
-          const coverage = require('./coverage/coverage-summary.json');
+          node -e '
+          const coverage = require("./coverage/coverage-summary.json");
           const total = coverage.total;
           const thresholds = {
             statements: 80,
@@ -111,20 +111,20 @@ jobs:
             const actual = total[key].pct;
             const required = thresholds[key];
             if (actual < required) {
-              console.log(\`❌ ${key}: ${actual.toFixed(2)}% < ${required}% (threshold)\`);
+              console.log("❌ " + key + ": " + actual.toFixed(2) + "% < " + required + "% (threshold)");
               failed = true;
             } else {
-              console.log(\`✅ ${key}: ${actual.toFixed(2)}% >= ${required}%\`);
+              console.log("✅ " + key + ": " + actual.toFixed(2) + "% >= " + required + "%");
             }
           });
 
           if (failed) {
-            console.log('\\n❌ Coverage thresholds not met!');
+            console.log("\n❌ Coverage thresholds not met!");
             process.exit(1);
           } else {
-            console.log('\\n✅ All coverage thresholds met!');
+            console.log("\n✅ All coverage thresholds met!");
           }
-          "
+          '
           if [ $? -ne 0 ]; then
             echo "❌ Coverage check failed!"
             exit 1
