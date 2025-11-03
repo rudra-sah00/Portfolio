@@ -1,13 +1,16 @@
-import React from 'react';
-import { GitHubRepo } from '@/types';
-import ReadmeViewer from './ReadmeViewer';
+import React from "react";
+import { GitHubRepo } from "@/types";
+import ReadmeViewer from "./ReadmeViewer";
 
 interface ReadmeSectionProps {
   repositories: GitHubRepo[];
   loading: boolean;
 }
 
-const ReadmeSection: React.FC<ReadmeSectionProps> = ({ repositories, loading }) => {
+const ReadmeSection: React.FC<ReadmeSectionProps> = ({
+  repositories,
+  loading,
+}) => {
   return (
     <div className="tabs_right">
       {loading ? (
@@ -19,8 +22,8 @@ const ReadmeSection: React.FC<ReadmeSectionProps> = ({ repositories, loading }) 
       ) : (
         repositories.map((repo) => (
           <div key={`readme-${repo.id}`} className="tabs_video readme-content">
-            <ReadmeViewer 
-              content={repo.readme_content || '# No README available'} 
+            <ReadmeViewer
+              content={repo.readme_content || "# No README available"}
               repoName={repo.name}
             />
           </div>

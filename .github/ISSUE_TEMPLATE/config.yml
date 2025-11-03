@@ -3,11 +3,11 @@ contact_links:
   - name: 💬 Ask a Question
     url: https://github.com/rudra-sah00/Portfolio/discussions
     about: Ask questions and discuss ideas with the community
-  
+
   - name: 🔒 Security Issue
     url: https://github.com/rudra-sah00/Portfolio/security/advisories/new
     about: Report a security vulnerability (private)
-  
+
   - name: 📖 Documentation
     url: https://github.com/rudra-sah00/Portfolio#readme
     about: Read the project documentation

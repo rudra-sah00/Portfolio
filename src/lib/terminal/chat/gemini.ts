@@ -8,11 +8,12 @@ export interface GeminiResponse {
   }>;
 }
 
-import { GitHubRepo } from '@/types';
+import { GitHubRepo } from "@/types";
 
 export class GeminiAPI {
   private apiKey: string;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+  private baseUrl =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -33,10 +34,10 @@ export class GeminiAPI {
     // Analyze languages from all repositories
     const languageStats: Record<string, number> = {};
     const totalRepos = repositories.length;
-    
-    repositories.forEach(repo => {
+
+    repositories.forEach((repo) => {
       if (repo.languages) {
-        Object.keys(repo.languages).forEach(lang => {
+        Object.keys(repo.languages).forEach((lang) => {
           languageStats[lang] = (languageStats[lang] || 0) + 1;
         });
       }
@@ -47,18 +48,21 @@ export class GeminiAPI {
       .map(([lang, count]) => ({
         language: lang,
         percentage: Math.round((count / totalRepos) * 100),
-        count
+        count,
       }))
       .sort((a, b) => b.percentage - a.percentage);
 
     const topLanguages = sortedLanguages.slice(0, 8);
-    
+
     const techStackSection = `Tech Stack & Skills Analysis (Based on ${totalRepos} GitHub Projects):
 
 Primary Languages & Frameworks:
-${topLanguages.map(({ language, percentage, count }) => 
-  `• ${language}: ${percentage}% proficiency (used in ${count}/${totalRepos} projects)`
-).join('\n')}
+${topLanguages
+  .map(
+    ({ language, percentage, count }) =>
+      `• ${language}: ${percentage}% proficiency (used in ${count}/${totalRepos} projects)`
+  )
+  .join("\n")}
 
 Technology Categories:
 • Frontend: React, Next.js, TypeScript, JavaScript, HTML, CSS, TailwindCSS, Flutter
@@ -92,39 +96,53 @@ Technology Categories:
    • Backend: Python inference engine + APIs.`;
     }
 
-    const projectsList = repositories.map((repo, index) => {
-      const languages = repo.languages ? Object.keys(repo.languages).join(', ') : 'Not specified';
-      const description = repo.description || 'No description available';
-      
-      return `${index + 1}. ${repo.name}
+    const projectsList = repositories
+      .map((repo, index) => {
+        const languages = repo.languages
+          ? Object.keys(repo.languages).join(", ")
+          : "Not specified";
+        const description = repo.description || "No description available";
+
+        return `${index + 1}. ${repo.name}
    • ${description}
    • Languages: ${languages}
    • GitHub: ${repo.html_url}`;
-    }).join('\n\n');
+      })
+      .join("\n\n");
 
     return `Projects:\n${projectsList}`;
   }
 
-  private findProjectByName(repositories: GitHubRepo[], projectName: string): GitHubRepo | null {
+  private findProjectByName(
+    repositories: GitHubRepo[],
+    projectName: string
+  ): GitHubRepo | null {
     if (!repositories || repositories.length === 0) return null;
-    
+
     const searchTerm = projectName.toLowerCase();
-    return repositories.find(repo => 
-      repo.name.toLowerCase().includes(searchTerm) ||
-      (repo.description && repo.description.toLowerCase().includes(searchTerm))
-    ) || null;
+    return (
+      repositories.find(
+        (repo) =>
+          repo.name.toLowerCase().includes(searchTerm) ||
+          (repo.description &&
+            repo.description.toLowerCase().includes(searchTerm))
+      ) || null
+    );
   }
 
   private generateProjectDetails(repo: GitHubRepo): string {
-    const languages = repo.languages ? Object.keys(repo.languages).join(', ') : 'Not specified';
-    const readmePreview = repo.readme_content ? 
-      repo.readme_content.substring(0, 1500) + (repo.readme_content.length > 1500 ? '...' : '') : 
-      'No README available';
+    const languages = repo.languages
+      ? Object.keys(repo.languages).join(", ")
+      : "Not specified";
+    const readmePreview = repo.readme_content
+      ? repo.readme_content.substring(0, 1500) +
+        (repo.readme_content.length > 1500 ? "..." : "")
+      : "No README available";
 
     return `
 DETAILED PROJECT INFORMATION FOR: ${repo.name}
 
-Description: ${repo.description || 'No description available'}
+Description: ${repo.description || "No description available"}
 Languages/Tech Stack: ${languages}
 GitHub URL: ${repo.html_url}
 
@@ -134,37 +152,51 @@ ${readmePreview}
 Use this detailed information to provide comprehensive answers about this specific project.`;
   }
 
-  async sendMessage(message: string, repositories: GitHubRepo[] = []): Promise<string> {
+  async sendMessage(
+    message: string,
+    repositories: GitHubRepo[] = []
+  ): Promise<string> {
     const projectsSection = this.generateProjectsSection(repositories);
     const techStackAnalysis = this.generateTechStackAnalysis(repositories);
-    
+
     // Check if the user is asking about a specific project
-    let specificProjectDetails = '';
+    let specificProjectDetails = "";
     if (repositories && repositories.length > 0) {
       const messageWords = message.toLowerCase().split(/\s+/);
-      
+
       // Check for exact matches first
       for (const repo of repositories) {
-        if (messageWords.some(word => repo.name.toLowerCase().includes(word) || word.includes(repo.name.toLowerCase()))) {
+        if (
+          messageWords.some(
+            (word) =>
+              repo.name.toLowerCase().includes(word) ||
+              word.includes(repo.name.toLowerCase())
+          )
+        ) {
           specificProjectDetails = this.generateProjectDetails(repo);
           break;
         }
       }
-      
+
       // Also check for partial matches with project names
       if (!specificProjectDetails) {
         for (const repo of repositories) {
           const repoWords = repo.name.toLowerCase().split(/[-_\s]+/);
-          if (repoWords.some(repoWord => messageWords.some(msgWord => 
-            msgWord.includes(repoWord) || repoWord.includes(msgWord)
-          ))) {
+          if (
+            repoWords.some((repoWord) =>
+              messageWords.some(
+                (msgWord) =>
+                  msgWord.includes(repoWord) || repoWord.includes(msgWord)
+              )
+            )
+          ) {
             specificProjectDetails = this.generateProjectDetails(repo);
             break;
           }
         }
       }
     }
-    
+
     const systemPrompt = `You are Rudra Narayana Sahoo, a Full-stack Developer and AI-Prompt Engineer.
 You specialize in building fast, scalable web applications and cross-platform mobile apps (Android/iOS) with strong expertise in AI-driven solutions, frontend, backend, cloud, and DevOps.
 
@@ -223,23 +255,27 @@ Instructions:
 
     try {
       const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: fullPrompt
-            }]
-          }],
+          contents: [
+            {
+              parts: [
+                {
+                  text: fullPrompt,
+                },
+              ],
+            },
+          ],
           generationConfig: {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 1024,
-          }
-        })
+          },
+        }),
       });
 
       if (!response.ok) {
@@ -247,15 +283,15 @@ Instructions:
       }
 
       const data: GeminiResponse = await response.json();
-      
+
       if (data.candidates && data.candidates[0] && data.candidates[0].content) {
         return data.candidates[0].content.parts[0].text;
       } else {
-        throw new Error('No response from Gemini API');
+        throw new Error("No response from Gemini API");
       }
     } catch (error) {
-      console.error('Gemini API Error:', error);
-      return 'Sorry, I encountered an error while processing your request. Please try again.';
+      console.error("Gemini API Error:", error);
+      return "Sorry, I encountered an error while processing your request. Please try again.";
     }
   }
 }

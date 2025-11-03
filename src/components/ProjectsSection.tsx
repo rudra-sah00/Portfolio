@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { GitHubRepo } from '@/types';
-import { useScrollAnimation } from '@/hooks';
-import { ProjectInfo, GitHubButton, ReadmeSection } from './projects';
+import { useEffect } from "react";
+import { GitHubRepo } from "@/types";
+import { useScrollAnimation } from "@/hooks";
+import { ProjectInfo, GitHubButton, ReadmeSection } from "./projects";
 
 interface ProjectsSectionProps {
   repositories: GitHubRepo[];
@@ -11,18 +11,17 @@ interface ProjectsSectionProps {
 }
 
 const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
-
   // Prevent scrolling until projects are loaded
   useEffect(() => {
     if (loading) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     // Cleanup on unmount
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [loading]);
 
@@ -33,7 +32,7 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
     return (
       <section className="section_tabs">
         <div className="padding-section-large">
-          <div className="tabs_height min-h-screen flex items-center justify-center">
+          <div className="tabs_height flex min-h-screen items-center justify-center">
             <div className="loading-container">
               {/* Animated Loading Spinner */}
               <div className="loading-spinner">
@@ -41,34 +40,34 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
                 <div className="spinner-ring"></div>
                 <div className="spinner-ring"></div>
               </div>
-              
+
               {/* Loading Text */}
               <div className="loading-text">
-                <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+                <h3 className="mb-2 text-2xl font-semibold text-gray-700">
                   Loading Projects
                 </h3>
-                <p className="text-gray-500 animate-pulse">
+                <p className="animate-pulse text-gray-500">
                   Fetching repositories from GitHub...
                 </p>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Loading Styles */}
         <style jsx>{`
           .loading-container {
             text-align: center;
             padding: 2rem;
           }
-          
+
           .loading-spinner {
             position: relative;
             width: 80px;
             height: 80px;
             margin: 0 auto 2rem;
           }
-          
+
           .spinner-ring {
             position: absolute;
             top: 0;
@@ -80,17 +79,17 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
             border-radius: 50%;
             animation: spin 1.2s linear infinite;
           }
-          
+
           .spinner-ring:nth-child(2) {
             animation-delay: -0.4s;
             border-top-color: #059669;
           }
-          
+
           .spinner-ring:nth-child(3) {
             animation-delay: -0.8s;
             border-top-color: #047857;
           }
-          
+
           @keyframes spin {
             0% {
               transform: rotate(0deg);
@@ -99,11 +98,11 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
               transform: rotate(360deg);
             }
           }
-          
+
           .loading-text {
             animation: fadeInUp 0.6s ease-out;
           }
-          
+
           @keyframes fadeInUp {
             from {
               opacity: 0;
@@ -122,30 +121,34 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
   return (
     <section className="section_tabs">
       <div className="padding-section-large">
-        <div 
-          className="tabs_height" 
-          style={{ 
-            height: repositories.length > 0 
-              ? `${repositories.length * 150}vh` // 150vh per repository for smooth scrolling
-              : '550vh' // Default height while loading
+        <div
+          className="tabs_height"
+          style={{
+            height:
+              repositories.length > 0
+                ? `${repositories.length * 150}vh` // 150vh per repository for smooth scrolling
+                : "550vh", // Default height while loading
           }}
         >
           <div className="tabs_sticky-wrapper">
             <div className="tabs_container">
-              <div className="tabs_component flex flex-col lg:flex-row gap-4 lg:gap-8">
-                <div className="tabs_left w-full lg:w-auto lg:min-w-[400px] lg:max-w-[500px]">
+              <div className="tabs_component flex flex-col gap-4 lg:flex-row lg:gap-8">
+                <div className="tabs_left w-full lg:w-auto lg:max-w-[500px] lg:min-w-[400px]">
                   <ProjectInfo repositories={repositories} loading={loading} />
                   <GitHubButton repositories={repositories} loading={loading} />
                 </div>
-                <div className="readme_section w-full lg:flex-1 min-w-0">
-                  <ReadmeSection repositories={repositories} loading={loading} />
+                <div className="readme_section w-full min-w-0 lg:flex-1">
+                  <ReadmeSection
+                    repositories={repositories}
+                    loading={loading}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Responsive Styles */}
       <style jsx>{`
         .tabs_component {
@@ -153,53 +156,53 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
           word-wrap: break-word;
           hyphens: auto;
         }
-        
+
         .tabs_left {
           flex-shrink: 0;
         }
-        
+
         .readme_section {
           overflow-wrap: break-word;
           word-break: break-word;
         }
-        
+
         /* Small laptop adjustments */
         @media (max-width: 1366px) and (min-width: 1024px) {
           .tabs_component {
             padding: 0 1rem;
             gap: 1rem !important;
           }
-          
+
           .tabs_left {
             min-width: 300px !important;
             max-width: 400px !important;
           }
-          
+
           .readme_section {
             font-size: 0.9rem;
             line-height: 1.5;
           }
         }
-        
+
         /* Extra small laptops (14 inch and below) */
         @media (max-width: 1280px) and (min-width: 1024px) {
           .tabs_component {
             flex-direction: column !important;
             gap: 2rem !important;
           }
-          
+
           .tabs_left {
             width: 100% !important;
             max-width: none !important;
             min-width: auto !important;
           }
-          
+
           .readme_section {
             width: 100% !important;
             margin-top: 1rem;
           }
         }
-        
+
         /* Tablet and mobile */
         @media (max-width: 1023px) {
           .tabs_component {
@@ -207,7 +210,7 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
             padding: 0 0.5rem;
             gap: 1.5rem !important;
           }
-          
+
           .tabs_left,
           .readme_section {
             width: 100% !important;
@@ -215,7 +218,7 @@ const ProjectsSection = ({ repositories, loading }: ProjectsSectionProps) => {
             min-width: auto !important;
           }
         }
-        
+
         /* Mobile specific */
         @media (max-width: 768px) {
           .tabs_component {

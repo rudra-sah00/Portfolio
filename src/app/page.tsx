@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { GitHubRepo } from '@/types';
-import { fetchGitHubRepositories } from '@/lib/api';
-import Hero from '@/components/Hero';
-import ProjectsSection from '@/components/ProjectsSection';
-import Footer from '@/components/Footer';
+import { useEffect, useState } from "react";
+import { GitHubRepo } from "@/types";
+import { fetchGitHubRepositories } from "@/lib/api";
+import Hero from "@/components/Hero";
+import ProjectsSection from "@/components/ProjectsSection";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [repositories, setRepositories] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 🔧 Change this to any GitHub username to fetch their public repositories
-  const username = 'rudra-sah00'; // Try: 'octocat', 'torvalds', 'gaearon', etc.
+  const username = "rudra-sah00"; // Try: 'octocat', 'torvalds', 'gaearon', etc.
 
   // Fetch repositories and their README files
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Home() {
           setLoading(false);
         }, 800);
       } catch (error) {
-        console.error('Error loading repositories:', error);
+        console.error("Error loading repositories:", error);
         setLoading(false);
       }
     };

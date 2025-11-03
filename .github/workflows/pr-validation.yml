@@ -13,7 +13,7 @@ jobs:
   pr-metadata:
     name: PR Metadata Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Check PR title
         uses: actions/github-script@v7
@@ -22,7 +22,7 @@ jobs:
             const title = context.payload.pull_request.title;
             const validPrefixes = ['feat:', 'fix:', 'docs:', 'style:', 'refactor:', 'test:', 'chore:', 'perf:', 'ci:', 'build:'];
             const hasValidPrefix = validPrefixes.some(prefix => title.toLowerCase().startsWith(prefix));
-            
+
             if (!hasValidPrefix) {
               core.setFailed(`PR title should start with one of: ${validPrefixes.join(', ')}`);
               
@@ -59,10 +59,10 @@ jobs:
             const deletions = pr.deletions;
             const changedFiles = pr.changed_files;
             const totalChanges = additions + deletions;
-            
+
             let size = 'small';
             let emoji = '🟢';
-            
+
             if (totalChanges > 1000 || changedFiles > 20) {
               size = 'large';
               emoji = '🔴';
@@ -70,16 +70,16 @@ jobs:
               size = 'medium';
               emoji = '🟡';
             }
-            
+
             console.log(`PR size: ${size} ${emoji}`);
             console.log(`Total changes: ${totalChanges} (${additions} additions, ${deletions} deletions)`);
             console.log(`Changed files: ${changedFiles}`);
-            
+
             // Add size label
             const labels = ['size: small', 'size: medium', 'size: large'];
             const currentLabels = pr.labels.map(l => l.name);
             const labelsToRemove = labels.filter(l => currentLabels.includes(l));
-            
+
             // Remove old size labels
             for (const label of labelsToRemove) {
               await github.rest.issues.removeLabel({
@@ -89,7 +89,7 @@ jobs:
                 name: label
               }).catch(() => {});
             }
-            
+
             // Add new size label
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -101,7 +101,7 @@ jobs:
   auto-label:
     name: Auto Label PR
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -117,9 +117,9 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            
+
             const labels = new Set();
-            
+
             files.forEach(file => {
               const path = file.filename;
               
@@ -154,7 +154,7 @@ jobs:
                 labels.add('dependencies');
               }
             });
-            
+
             if (labels.size > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -170,14 +170,14 @@ jobs:
     name: Welcome First-Time Contributors
     runs-on: ubuntu-latest
     if: github.event.action == 'opened'
-    
+
     steps:
       - name: Check if first-time contributor
         uses: actions/github-script@v7
         with:
           script: |
             const creator = context.payload.pull_request.user.login;
-            
+
             // Get all PRs by this user
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
@@ -185,7 +185,7 @@ jobs:
               state: 'all',
               creator: creator
             });
-            
+
             // If this is their first PR
             if (prs.length === 1) {
               const welcomeMessage = `👋 Welcome @${creator}!
@@ -214,4 +214,3 @@ jobs:
                 labels: ['first-time contributor']
               });
             }
-

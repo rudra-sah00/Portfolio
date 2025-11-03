@@ -1,7 +1,7 @@
-import React from 'react';
-import { GitHubRepo } from '@/types';
-import TechStack from './TechStack';
-import styles from './ProjectInfo.module.css';
+import React from "react";
+import { GitHubRepo } from "@/types";
+import TechStack from "./TechStack";
+import styles from "./ProjectInfo.module.css";
 
 interface ProjectInfoProps {
   repositories: GitHubRepo[];
@@ -22,7 +22,9 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ repositories, loading }) => {
           <div key={repo.id} className="tabs_let-content">
             <div className={styles.projectHeader}>
               <h2 className="heading-style-h4 text-color-gray100">
-                {repo.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                {repo.name
+                  .replace(/-/g, " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
               </h2>
               {repo.isOrganizationRepo && (
                 <div className={styles.organizationBadge}>
@@ -31,8 +33,11 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ repositories, loading }) => {
               )}
             </div>
             <div className="tabs_line"></div>
-            <p className={`text-size-small text-color-gray400 ${styles.hideOnMobile}`}>
-              {repo.description || 'No description available for this repository.'}
+            <p
+              className={`text-size-small text-color-gray400 ${styles.hideOnMobile}`}
+            >
+              {repo.description ||
+                "No description available for this repository."}
             </p>
             <div className={styles.hideOnMobile}>
               <TechStack languages={repo.languages || {}} />

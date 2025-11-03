@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Rudra Sahoo - Portfolio",
-  description: "Portfolio of Rudra Sahoo - Full Stack Developer specializing in modern web technologies, React, Next.js, and AI integration.",
+  description:
+    "Portfolio of Rudra Sahoo - Full Stack Developer specializing in modern web technologies, React, Next.js, and AI integration.",
 };
 
 export default function RootLayout({

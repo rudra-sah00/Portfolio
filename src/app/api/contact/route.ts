@@ -1,24 +1,25 @@
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(request: Request) {
   try {
-    const { name, contactOption, contactDetails, message } = await request.json();
+    const { name, contactOption, contactDetails, message } =
+      await request.json();
 
     // Validate required fields
     if (!name || !contactOption || !contactDetails || !message) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: "All fields are required" },
         { status: 400 }
       );
     }
 
     // Create transporter using Gmail SMTP
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'rudra.workwith@gmail.com',
-        pass: 'qgoe abhn agrg svus',
+        user: "rudra.workwith@gmail.com",
+        pass: "qgoe abhn agrg svus",
       },
     });
 
@@ -261,14 +262,14 @@ export async function POST(request: Request) {
               </div>
               
               <div class="timestamp">
-                📅 Received on ${new Date().toLocaleString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  timeZoneName: 'short'
+                📅 Received on ${new Date().toLocaleString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  timeZoneName: "short",
                 })}
               </div>
             </div>
@@ -280,7 +281,7 @@ export async function POST(request: Request) {
     // Email options
     const mailOptions = {
       from: '"Portfolio Contact Form" <rudra.workwith@gmail.com>',
-      to: 'rudranarayanaknr@gmail.com',
+      to: "rudranarayanaknr@gmail.com",
       subject: `🔥 New Contact: ${name} wants to connect!`,
       html: htmlTemplate,
       text: `
@@ -299,14 +300,13 @@ Received on: ${new Date().toLocaleString()}
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json(
-      { message: 'Email sent successfully!' },
+      { message: "Email sent successfully!" },
       { status: 200 }
     );
-
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error("Error sending email:", error);
     return NextResponse.json(
-      { error: 'Failed to send email' },
+      { error: "Failed to send email" },
       { status: 500 }
     );
   }

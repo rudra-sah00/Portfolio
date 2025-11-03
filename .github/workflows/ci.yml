@@ -91,27 +91,27 @@ jobs:
             const fs = require('fs');
             const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
             const total = coverage.total;
-            
+
             const getStatus = (pct, threshold) => {
               if (pct >= threshold) return '✅';
               if (pct >= threshold - 5) return '⚠️';
               return '❌';
             };
-            
+
             const comment = `## 📊 Test Coverage Report
-            
+
             | Metric | Coverage | Threshold | Status |
             |--------|----------|-----------|--------|
             | Statements | ${total.statements.pct.toFixed(2)}% | 80% | ${getStatus(total.statements.pct, 80)} |
             | Branches | ${total.branches.pct.toFixed(2)}% | 70% | ${getStatus(total.branches.pct, 70)} |
             | Functions | ${total.functions.pct.toFixed(2)}% | 75% | ${getStatus(total.functions.pct, 75)} |
             | Lines | ${total.lines.pct.toFixed(2)}% | 80% | ${getStatus(total.lines.pct, 80)} |
-            
+
             **Total Tests:** ${Object.keys(coverage).length - 1} files tested
-            
+
             ${total.statements.pct >= 80 && total.branches.pct >= 70 ? '✅ **Coverage thresholds met!**' : '⚠️ **Some coverage thresholds not met**'}
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -175,11 +175,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     needs: [lint-and-type-check, test, build, security-audit]
-    
+
     steps:
       - name: All checks passed
         run: echo "All PR checks passed successfully! ✅"
-      
+
       - name: Comment PR success
         uses: actions/github-script@v7
         with:

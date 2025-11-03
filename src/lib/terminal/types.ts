@@ -1,5 +1,5 @@
-import { ChatSession } from './chat/types';
-import { GitHubRepo } from '../../types';
+import { ChatSession } from "./chat/types";
+import { GitHubRepo } from "../../types";
 
 export interface ContactForm {
   step: number;
@@ -48,5 +48,9 @@ export interface CommandResult {
 export interface Command {
   name: string;
   description: string;
-  execute: (args: string[], state: TerminalState, repositories?: GitHubRepo[]) => CommandResult | Promise<CommandResult>;
+  execute: (
+    args: string[],
+    state: TerminalState,
+    repositories?: GitHubRepo[]
+  ) => CommandResult | Promise<CommandResult>;
 }
