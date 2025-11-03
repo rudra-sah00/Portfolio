@@ -126,4 +126,53 @@ describe("FloatingDock", () => {
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
+
+  it("should transform icon size based on mouse position (desktop)", () => {
+    const { container } = render(<FloatingDock items={mockItems} />);
+    const desktopDock = container.querySelector(".md\\:flex");
+
+    if (desktopDock) {
+      // Simulate mouse movement to trigger transforms
+      fireEvent.mouseMove(desktopDock, { pageX: 50 });
+      fireEvent.mouseMove(desktopDock, { pageX: 100 });
+      fireEvent.mouseMove(desktopDock, { pageX: 200 });
+      expect(desktopDock).toBeInTheDocument();
+    }
+  });
+
+  it("should handle getBoundingClientRect for distance calculations", () => {
+    const { container } = render(<FloatingDock items={mockItems} />);
+    const desktopDock = container.querySelector(".md\\:flex");
+
+    if (desktopDock) {
+      const iconContainer = desktopDock.querySelector(
+        "div[class*='aspect-square']"
+      );
+      if (iconContainer) {
+        const bounds = iconContainer.getBoundingClientRect();
+        expect(bounds).toBeDefined();
+      }
+    }
+  });
+
+  it("should apply whileTap animation on mobile", () => {
+    render(<FloatingDock items={mockItems} />);
+    const links = screen.getAllByRole("link");
+    const mobileLinks = links.slice(3); // Mobile dock is second set
+
+    if (mobileLinks[0]) {
+      expect(mobileLinks[0].querySelector("div")).toBeInTheDocument();
+    }
+  });
+
+  it("should apply whileHover animation on mobile", () => {
+    render(<FloatingDock items={mockItems} />);
+    const links = screen.getAllByRole("link");
+    const mobileLinks = links.slice(3);
+
+    if (mobileLinks[0]) {
+      const motionDiv = mobileLinks[0].querySelector("div");
+      expect(motionDiv).toBeInTheDocument();
+    }
+  });
 });

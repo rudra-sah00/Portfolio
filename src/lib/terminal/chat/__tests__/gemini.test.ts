@@ -513,4 +513,127 @@ describe("GeminiAPI", () => {
       expect(body.generationConfig.maxOutputTokens).toBe(1024);
     });
   });
+
+  describe("Project-specific queries", () => {
+    it("should include specific project details when project name is mentioned", async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "Here's information about test-repo" }],
+                role: "model",
+              },
+            },
+          ],
+        }),
+      });
+
+      await geminiAPI.sendMessage("tell me about test-repo", mockRepos);
+
+      const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(fetchCall[1].body);
+
+      // The fullPrompt includes project details
+      const promptText = body.contents[0].parts[0].text;
+      expect(promptText).toContain("test-repo");
+      expect(promptText).toContain("TypeScript");
+    });
+
+    it("should find project by partial name match", async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "Python project details" }],
+                role: "model",
+              },
+            },
+          ],
+        }),
+      });
+
+      await geminiAPI.sendMessage("what is python", mockRepos);
+
+      const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(fetchCall[1].body);
+      const promptText = body.contents[0].parts[0].text;
+
+      expect(promptText).toContain("python-project");
+      expect(promptText).toContain("Python");
+    });
+
+    it("should include README preview when available", async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "README info" }],
+                role: "model",
+              },
+            },
+          ],
+        }),
+      });
+
+      const repoWithLongReadme: GitHubRepo = {
+        id: 4,
+        name: "readme-test",
+        description: "Test repo",
+        html_url: "https://github.com/test/readme",
+        languages: { TypeScript: 100 },
+        readme_content: "# Long README\n" + "x".repeat(2000),
+      };
+
+      await geminiAPI.sendMessage("tell me about readme", [repoWithLongReadme]);
+
+      const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(fetchCall[1].body);
+      const promptText = body.contents[0].parts[0].text;
+
+      // Should include truncated README
+      expect(promptText).toContain("...");
+      expect(promptText).toContain("readme-test");
+    });
+
+    it("should handle project without README", async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [{ text: "Project without README" }],
+                role: "model",
+              },
+            },
+          ],
+        }),
+      });
+
+      const repoWithoutReadme: GitHubRepo = {
+        id: 5,
+        name: "no-readme",
+        description: "No README repo",
+        html_url: "https://github.com/test/no-readme",
+        languages: { JavaScript: 100 },
+        readme_content: undefined,
+      };
+
+      await geminiAPI.sendMessage("tell me about no-readme", [
+        repoWithoutReadme,
+      ]);
+
+      const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(fetchCall[1].body);
+      const promptText = body.contents[0].parts[0].text;
+
+      expect(promptText).toContain("No README available");
+    });
+  });
 });
