@@ -25,6 +25,15 @@ jest.mock("nodemailer", () => ({
   })),
 }));
 
+// Mock env module
+jest.mock("@/lib/env", () => ({
+  env: {
+    EMAIL_USER: "test@example.com",
+    EMAIL_PASS: "test-password",
+    EMAIL_TO: "recipient@example.com",
+  },
+}));
+
 describe("/api/contact API Route", () => {
   it("should return 400 if name is missing", async () => {
     const request = new MockNextRequest("http://localhost:3000/api/contact", {
