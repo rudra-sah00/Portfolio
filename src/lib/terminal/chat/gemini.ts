@@ -3,7 +3,7 @@ import { GitHubRepo } from "@/types";
 export class GeminiAPI {
   private apiRoute = "/api/chat"; // Use server-side API route
 
-  constructor(_apiKey?: string, _fallbackApiKey?: string) {
+  constructor() {
     // API keys are now handled server-side for security
     console.log("Gemini API client initialized - using server-side API route");
   }

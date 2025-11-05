@@ -1,5 +1,10 @@
-import { GeminiAPI, GeminiResponse } from "../gemini";
+import { GeminiAPI } from "../gemini";
 import { GitHubRepo } from "@/types";
+
+// Mock the API response type
+interface MockApiResponse {
+  response: string;
+}
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -68,7 +73,7 @@ describe("GeminiAPI", () => {
 
   describe("sendMessage - Success Cases", () => {
     it("should send message and receive response", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [
           {
             content: {
@@ -98,7 +103,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should include repository data in context", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [
           {
             content: {
@@ -127,7 +132,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should work without repositories", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [
           {
             content: {
@@ -147,7 +152,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should detect and include specific project details", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [
           {
             content: {
@@ -173,7 +178,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should detect project by partial name match", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Found project" }] } }],
       };
 
@@ -246,7 +251,7 @@ describe("GeminiAPI", () => {
 
   describe("Tech Stack Analysis", () => {
     it("should generate tech stack with empty repositories", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Tech stack info" }] } }],
       };
 
@@ -265,7 +270,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should calculate language percentages correctly", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Languages" }] } }],
       };
 
@@ -296,7 +301,7 @@ describe("GeminiAPI", () => {
         },
       ];
 
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -312,7 +317,7 @@ describe("GeminiAPI", () => {
 
   describe("Projects Section Generation", () => {
     it("should generate default projects when no repos", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Projects" }] } }],
       };
 
@@ -330,7 +335,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should list all repositories in projects section", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Projects" }] } }],
       };
 
@@ -361,7 +366,7 @@ describe("GeminiAPI", () => {
         },
       ];
 
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -382,7 +387,7 @@ describe("GeminiAPI", () => {
 
   describe("Project Details Generation", () => {
     it("should include readme content when available", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Details" }] } }],
       };
 
@@ -411,7 +416,7 @@ describe("GeminiAPI", () => {
         },
       ];
 
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -438,7 +443,7 @@ describe("GeminiAPI", () => {
         },
       ];
 
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -457,7 +462,7 @@ describe("GeminiAPI", () => {
 
   describe("API Request Configuration", () => {
     it("should include correct headers", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -473,7 +478,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should include API key in URL", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -489,7 +494,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should use POST method", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
@@ -505,7 +510,7 @@ describe("GeminiAPI", () => {
     });
 
     it("should include generation config", async () => {
-      const mockResponse: GeminiResponse = {
+      const mockResponse: MockApiResponse = {
         candidates: [{ content: { parts: [{ text: "Response" }] } }],
       };
 
