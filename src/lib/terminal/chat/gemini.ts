@@ -1,39 +1,11 @@
-export interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
-}
-
 import { GitHubRepo } from "@/types";
 
 export class GeminiAPI {
-  private apiKeys: string[];
-  private currentKeyIndex: number = 0;
-  private baseUrl =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+  private apiRoute = "/api/chat"; // Use server-side API route
 
-  constructor(apiKey: string, fallbackApiKey?: string) {
-    this.apiKeys = [apiKey];
-    if (fallbackApiKey) {
-      this.apiKeys.push(fallbackApiKey);
-    }
-  }
-
-  private getCurrentApiKey(): string {
-    return this.apiKeys[this.currentKeyIndex];
-  }
-
-  private switchToNextKey(): boolean {
-    if (this.currentKeyIndex < this.apiKeys.length - 1) {
-      this.currentKeyIndex++;
-      console.log(`Switched to fallback API key ${this.currentKeyIndex + 1}`);
-      return true;
-    }
-    return false;
+  constructor(_apiKey?: string, _fallbackApiKey?: string) {
+    // API keys are now handled server-side for security
+    console.log("Gemini API client initialized - using server-side API route");
   }
 
   private generateTechStackAnalysis(repositories: GitHubRepo[]): string {
@@ -173,48 +145,49 @@ Use this detailed information to provide comprehensive answers about this specif
     message: string,
     repositories: GitHubRepo[] = []
   ): Promise<string> {
-    const projectsSection = this.generateProjectsSection(repositories);
-    const techStackAnalysis = this.generateTechStackAnalysis(repositories);
+    try {
+      // Check if the user is asking about a specific project
+      let specificProjectDetails = "";
+      if (repositories && repositories.length > 0) {
+        const messageWords = message.toLowerCase().split(/\s+/);
 
-    // Check if the user is asking about a specific project
-    let specificProjectDetails = "";
-    if (repositories && repositories.length > 0) {
-      const messageWords = message.toLowerCase().split(/\s+/);
-
-      // Check for exact matches first
-      for (const repo of repositories) {
-        if (
-          messageWords.some(
-            (word) =>
-              repo.name.toLowerCase().includes(word) ||
-              word.includes(repo.name.toLowerCase())
-          )
-        ) {
-          specificProjectDetails = this.generateProjectDetails(repo);
-          break;
-        }
-      }
-
-      // Also check for partial matches with project names
-      if (!specificProjectDetails) {
+        // Check for exact matches first
         for (const repo of repositories) {
-          const repoWords = repo.name.toLowerCase().split(/[-_\s]+/);
           if (
-            repoWords.some((repoWord) =>
-              messageWords.some(
-                (msgWord) =>
-                  msgWord.includes(repoWord) || repoWord.includes(msgWord)
-              )
+            messageWords.some(
+              (word) =>
+                repo.name.toLowerCase().includes(word) ||
+                word.includes(repo.name.toLowerCase())
             )
           ) {
             specificProjectDetails = this.generateProjectDetails(repo);
             break;
           }
         }
-      }
-    }
 
-    const systemPrompt = `You are Rudra Narayana Sahoo, a Full-stack Developer and AI-Prompt Engineer.
+        // Also check for partial matches with project names
+        if (!specificProjectDetails) {
+          for (const repo of repositories) {
+            const repoWords = repo.name.toLowerCase().split(/[-_\s]+/);
+            if (
+              repoWords.some((repoWord) =>
+                messageWords.some(
+                  (msgWord) =>
+                    msgWord.includes(repoWord) || repoWord.includes(msgWord)
+                )
+              )
+            ) {
+              specificProjectDetails = this.generateProjectDetails(repo);
+              break;
+            }
+          }
+        }
+      }
+
+      const projectsSection = this.generateProjectsSection(repositories);
+      const techStackAnalysis = this.generateTechStackAnalysis(repositories);
+
+      const systemPrompt = `You are Rudra Narayana Sahoo, a Full-stack Developer and AI-Prompt Engineer.
 You specialize in building fast, scalable web applications and cross-platform mobile apps (Android/iOS) with strong expertise in AI-driven solutions, frontend, backend, cloud, and DevOps.
 
 Personal & Professional Background:
@@ -268,66 +241,30 @@ Instructions:
 • Keep responses professional, concise, and confident, as if Rudra is presenting in an interview or portfolio Q&A.
 • Do not provide general advice, tutorials, or help with topics outside of Rudra's portfolio.`;
 
-    const fullPrompt = `${systemPrompt}\n\nUser: ${message}\n\nRudra-B:`;
+      // Call server-side API route
+      const response = await fetch(this.apiRoute, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          systemPrompt,
+        }),
+      });
 
-    // Try with current API key, fallback to next if it fails
-    let lastError: Error | null = null;
-
-    for (let attempt = 0; attempt < this.apiKeys.length; attempt++) {
-      try {
-        const apiKey = this.getCurrentApiKey();
-        const response = await fetch(`${this.baseUrl}?key=${apiKey}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: fullPrompt,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1024,
-            },
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status}`);
-        }
-
-        const data: GeminiResponse = await response.json();
-
-        if (
-          data.candidates &&
-          data.candidates[0] &&
-          data.candidates[0].content
-        ) {
-          return data.candidates[0].content.parts[0].text;
-        } else {
-          throw new Error("No response from Gemini API");
-        }
-      } catch (error) {
-        lastError = error as Error;
-
-        // Try next key if available (silently switch to fallback)
-        if (!this.switchToNextKey()) {
-          break; // No more keys to try
-        }
-        // Continue to next attempt without logging error
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || `API request failed: ${response.status}`
+        );
       }
-    }
 
-    // All keys failed - only show error if all attempts exhausted
-    console.error("All Gemini API keys failed:", lastError);
-    return "Sorry, I encountered an error while processing your request. Please try again.";
+      const data = await response.json();
+      return data.response;
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      return "Sorry, I encountered an error while processing your request. Please try again.";
+    }
   }
 }

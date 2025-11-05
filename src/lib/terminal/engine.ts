@@ -16,13 +16,9 @@ import {
 } from "./commands";
 import { GeminiAPI } from "./chat/gemini";
 import { GitHubRepo } from "@/types";
-import { env } from "@/lib/env";
 
-// Initialize Gemini API with primary and fallback keys
-const geminiAPI = new GeminiAPI(
-  env.GEMINI_API_KEY || "",
-  env.GEMINI_API_KEY_FALLBACK
-);
+// Initialize Gemini API (keys are handled server-side)
+const geminiAPI = new GeminiAPI();
 
 export class TerminalEngine {
   private commands: Map<string, Command> = new Map();
