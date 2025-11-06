@@ -21,6 +21,45 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    rules: {
+      // Code Quality
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-debugger": "error",
+      "no-duplicate-imports": "error",
+      "prefer-const": "error",
+      "no-var": "error",
+
+      // TypeScript
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/explicit-function-return-type": [
+        "warn",
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+
+      // React Best Practices
+      "react/jsx-no-target-blank": "error",
+      "react/no-array-index-key": "warn",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
+      // Code Complexity
+      complexity: ["warn", 15],
+      "max-lines": ["warn", { max: 500, skipBlankLines: true }],
+      "max-depth": ["warn", 4],
+    },
+  },
 ];
 
 export default eslintConfig;

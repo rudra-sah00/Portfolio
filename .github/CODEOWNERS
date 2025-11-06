@@ -1,0 +1,26 @@
+# Code Owners for Portfolio Project
+# These owners will be automatically requested for review when a PR is opened
+
+# Default owner for everything in the repo
+* @rudra-sah00
+
+# Workflows and CI/CD configuration
+/.github/ @rudra-sah00
+
+# API routes
+/src/app/api/ @rudra-sah00
+
+# Core components
+/src/components/ @rudra-sah00
+
+# Terminal and chat functionality
+/src/lib/terminal/ @rudra-sah00
+
+# Tests
+**/__tests__/ @rudra-sah00
+*.test.ts @rudra-sah00
+*.test.tsx @rudra-sah00
+
+# Configuration files
+*.config.* @rudra-sah00
+.*rc* @rudra-sah00

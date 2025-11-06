@@ -34,12 +34,17 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "test:related": "jest --bail --findRelatedTests",
     "clean": "rm -rf .next",
     "analyze": "ANALYZE=true npm run build",
     "export": "next export",
     "prepare": "husky",
     "pre-commit": "lint-staged",
-    "validate": "npm run type-check && npm run lint && npm run format:check && npm run test:ci"
+    "validate": "npm run type-check && npm run lint && npm run format:check && npm run test:ci",
+    "quality": "npm run lint && npm run type-check && npm run test:coverage",
+    "check-updates": "npx npm-check-updates",
+    "update-deps": "npx npm-check-updates -u && npm install",
+    "security": "npm audit --audit-level=moderate"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.34.1",
