@@ -5,7 +5,7 @@ export class GeminiAPI {
 
   constructor() {
     // API keys are now handled server-side for security
-    console.log("Gemini API client initialized - using server-side API route");
+    // Initialization complete - using server-side API route
   }
 
   private generateTechStackAnalysis(repositories: GitHubRepo[]): string {

@@ -58,6 +58,235 @@ export class TerminalEngine {
     });
   }
 
+  private handlePasswordPrompt(
+    trimmedInput: string
+  ): CommandResult | undefined {
+    if (!this.state.passwordPrompt || !this.state.passwordPrompt.isActive) {
+      return undefined;
+    }
+
+    const prompt = this.state.passwordPrompt;
+
+    if (trimmedInput === prompt.expectedPassword) {
+      // Password correct
+      if (prompt.command === "root") {
+        this.state.passwordPrompt = undefined;
+        const result = {
+          output: [
+            '<span class="text-green-400">✅ Authentication successful</span>',
+            "Switching to root user...",
+            "⚠️  You now have root privileges",
+          ],
+          newState: getRootState(),
+        };
+        this.state = { ...this.state, ...result.newState };
+        return result;
+      }
+    } else {
+      // Password incorrect
+      this.state.passwordPrompt = undefined;
+      return {
+        output: [
+          '<span class="text-red-400">❌ Authentication failed</span>',
+          '<span class="text-red-300">su: Authentication failure</span>',
+          '<span class="text-gray-400">Incorrect password</span>',
+        ],
+      };
+    }
+  }
+
+  private async handleContactFormStep(
+    trimmedInput: string,
+    args: string[]
+  ): Promise<CommandResult | undefined> {
+    if (!this.state.contactForm) {
+      return undefined;
+    }
+
+    // Check if user wants to exit
+    if (trimmedInput === "exit") {
+      const command = this.commands.get("exit");
+      if (command) {
+        const result = await command.execute(args, this.state);
+        if (result.newState) {
+          this.state = { ...this.state, ...result.newState };
+        }
+        return result;
+      }
+    }
+
+    const contactForm = this.state.contactForm;
+
+    if (contactForm.step === 1) {
+      return this.handleContactStep1(trimmedInput, contactForm);
+    } else if (contactForm.step === 2) {
+      return this.handleContactStep2(trimmedInput, contactForm);
+    } else if (contactForm.step === 3) {
+      return this.handleContactStep3(trimmedInput, contactForm);
+    } else if (contactForm.step === 4) {
+      return this.handleContactStep4(trimmedInput, contactForm);
+    }
+  }
+
+  private handleContactStep1(
+    trimmedInput: string,
+    contactForm: ContactForm
+  ): CommandResult {
+    this.state.contactForm = {
+      ...contactForm,
+      name: trimmedInput,
+      step: 2,
+    };
+
+    return {
+      output: [
+        `<span class="text-green-400">✓</span> <span class="text-cyan-300">Name:</span> <span class="text-white">${trimmedInput}</span>`,
+        "",
+        '<span class="text-cyan-300">Step 2/4: What is your preferred contact method?</span>',
+        '<span class="text-yellow-200">  (e.g., email, LinkedIn, phone, WhatsApp, etc.)</span>',
+        "",
+      ],
+    };
+  }
+
+  private handleContactStep2(
+    trimmedInput: string,
+    contactForm: ContactForm
+  ): CommandResult {
+    this.state.contactForm = {
+      ...contactForm,
+      contactOption: trimmedInput,
+      step: 3,
+    };
+
+    const contactPrompt = this.getContactPrompt(trimmedInput);
+
+    return {
+      output: [
+        `<span class="text-green-400">✓</span> <span class="text-cyan-300">Contact Method:</span> <span class="text-white">${trimmedInput}</span>`,
+        "",
+        `<span class="text-cyan-300">Step 3/4: ${contactPrompt}</span>`,
+        '<span class="text-yellow-200">  (Please share your contact details)</span>',
+        "",
+      ],
+    };
+  }
+
+  private getContactPrompt(input: string): string {
+    const lowerInput = input.toLowerCase();
+
+    if (lowerInput.includes("email")) {
+      return "Please provide your email address:";
+    } else if (lowerInput.includes("linkedin")) {
+      return "Please provide your LinkedIn profile URL or username:";
+    } else if (lowerInput.includes("phone")) {
+      return "Please provide your phone number:";
+    } else if (lowerInput.includes("whatsapp")) {
+      return "Please provide your WhatsApp number:";
+    } else if (lowerInput.includes("telegram")) {
+      return "Please provide your Telegram username:";
+    } else if (lowerInput.includes("discord")) {
+      return "Please provide your Discord username:";
+    }
+    return `Please provide your ${input} details:`;
+  }
+
+  private handleContactStep3(
+    trimmedInput: string,
+    contactForm: ContactForm
+  ): CommandResult {
+    this.state.contactForm = {
+      ...contactForm,
+      contactDetails: trimmedInput,
+      step: 4,
+    };
+
+    return {
+      output: [
+        `<span class="text-green-400">✓</span> <span class="text-cyan-300">Contact Details:</span> <span class="text-white">${trimmedInput}</span>`,
+        "",
+        '<span class="text-cyan-300">Step 4/4: What\'s your message?</span>',
+        '<span class="text-yellow-200">  (Tell me what you\'d like to discuss)</span>',
+        "",
+      ],
+    };
+  }
+
+  private handleContactStep4(
+    trimmedInput: string,
+    contactForm: ContactForm
+  ): CommandResult {
+    const submittingAnimation = [
+      `<span class="text-green-400">✓</span> <span class="text-cyan-300">Message:</span> <span class="text-white">${trimmedInput}</span>`,
+      "",
+      '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
+      '<span class="text-cyan-400">║</span>                    <span class="text-yellow-300 font-bold">SUBMITTING CONTACT</span>                        <span class="text-cyan-400">║</span>',
+      '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
+      "",
+      '<span class="text-green-400">📤 Processing your contact request...</span>',
+      "",
+      '<span class="text-blue-300">┌─────────────────────────────────────────────────────────────┐</span>',
+      '<span class="text-blue-300">│</span> <span class="text-yellow-300">Status:</span> <span class="text-yellow-400">Preparing submission...</span>                      <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span>                                                             <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-gray-500">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span>     <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-yellow-400">0%</span> <span class="text-gray-400">Initializing...</span>                                    <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">└─────────────────────────────────────────────────────────────┘</span>',
+      "",
+    ];
+
+    const completedForm = {
+      ...contactForm,
+      message: trimmedInput,
+    };
+
+    this.state.contactForm = undefined;
+    this.state.completedContactForm = completedForm;
+    this.sendContactEmail(completedForm);
+
+    return {
+      output: submittingAnimation,
+      startSubmitting: true,
+    };
+  }
+
+  private async handleChatMessage(
+    trimmedInput: string
+  ): Promise<CommandResult> {
+    if (this.state.chatSession?.agent.id === "rudra-b") {
+      try {
+        const response = await geminiAPI.sendMessage(
+          trimmedInput,
+          this.repositories
+        );
+
+        this.state.chatSession.messages.push(
+          {
+            role: "user",
+            content: trimmedInput,
+            timestamp: new Date(),
+          },
+          {
+            role: "assistant",
+            content: response,
+            timestamp: new Date(),
+          }
+        );
+
+        return {
+          output: [`🤖 Rudra-B: ${response}`],
+        };
+      } catch {
+        return {
+          output: [
+            "Sorry, I encountered an error while processing your request.",
+            "Please try again.",
+          ],
+        };
+      }
+    }
+    return { output: [] };
+  }
+
   public async executeCommand(input: string): Promise<CommandResult> {
     const trimmedInput = input.trim();
 
@@ -70,163 +299,15 @@ export class TerminalEngine {
     const args = parts.slice(1);
 
     // Handle password prompt
-    if (this.state.passwordPrompt && this.state.passwordPrompt.isActive) {
-      const prompt = this.state.passwordPrompt;
-
-      if (trimmedInput === prompt.expectedPassword) {
-        // Password correct
-        if (prompt.command === "root") {
-          this.state.passwordPrompt = undefined;
-          const result = {
-            output: [
-              '<span class="text-green-400">✅ Authentication successful</span>',
-              "Switching to root user...",
-              "⚠️  You now have root privileges",
-            ],
-            newState: getRootState(),
-          };
-          this.state = { ...this.state, ...result.newState };
-          return result;
-        }
-      } else {
-        // Password incorrect
-        this.state.passwordPrompt = undefined;
-        return {
-          output: [
-            '<span class="text-red-400">❌ Authentication failed</span>',
-            '<span class="text-red-300">su: Authentication failure</span>',
-            '<span class="text-gray-400">Incorrect password</span>',
-          ],
-        };
-      }
+    const passwordResult = this.handlePasswordPrompt(trimmedInput);
+    if (passwordResult) {
+      return passwordResult;
     }
 
     // Handle contact form flow
-    if (this.state.contactForm) {
-      // Check if user wants to exit
-      if (trimmedInput === "exit") {
-        const command = this.commands.get("exit");
-        if (command) {
-          const result = await command.execute(args, this.state);
-          if (result.newState) {
-            this.state = { ...this.state, ...result.newState };
-          }
-          return result;
-        }
-      }
-
-      // Handle contact form steps
-      const contactForm = this.state.contactForm;
-
-      if (contactForm.step === 1) {
-        // Step 1: Collecting name
-        this.state.contactForm = {
-          ...contactForm,
-          name: trimmedInput,
-          step: 2,
-        };
-
-        return {
-          output: [
-            `<span class="text-green-400">✓</span> <span class="text-cyan-300">Name:</span> <span class="text-white">${trimmedInput}</span>`,
-            "",
-            '<span class="text-cyan-300">Step 2/4: What is your preferred contact method?</span>',
-            '<span class="text-yellow-200">  (e.g., email, LinkedIn, phone, WhatsApp, etc.)</span>',
-            "",
-          ],
-        };
-      } else if (contactForm.step === 2) {
-        // Step 2: Collecting contact option
-        this.state.contactForm = {
-          ...contactForm,
-          contactOption: trimmedInput,
-          step: 3,
-        };
-
-        let contactPrompt = "";
-        const lowerInput = trimmedInput.toLowerCase();
-
-        if (lowerInput.includes("email")) {
-          contactPrompt = "Please provide your email address:";
-        } else if (lowerInput.includes("linkedin")) {
-          contactPrompt =
-            "Please provide your LinkedIn profile URL or username:";
-        } else if (lowerInput.includes("phone")) {
-          contactPrompt = "Please provide your phone number:";
-        } else if (lowerInput.includes("whatsapp")) {
-          contactPrompt = "Please provide your WhatsApp number:";
-        } else if (lowerInput.includes("telegram")) {
-          contactPrompt = "Please provide your Telegram username:";
-        } else if (lowerInput.includes("discord")) {
-          contactPrompt = "Please provide your Discord username:";
-        } else {
-          contactPrompt = `Please provide your ${trimmedInput} details:`;
-        }
-
-        return {
-          output: [
-            `<span class="text-green-400">✓</span> <span class="text-cyan-300">Contact Method:</span> <span class="text-white">${trimmedInput}</span>`,
-            "",
-            `<span class="text-cyan-300">Step 3/4: ${contactPrompt}</span>`,
-            '<span class="text-yellow-200">  (Please share your contact details)</span>',
-            "",
-          ],
-        };
-      } else if (contactForm.step === 3) {
-        // Step 3: Collecting actual contact details
-        this.state.contactForm = {
-          ...contactForm,
-          contactDetails: trimmedInput,
-          step: 4,
-        };
-
-        return {
-          output: [
-            `<span class="text-green-400">✓</span> <span class="text-cyan-300">Contact Details:</span> <span class="text-white">${trimmedInput}</span>`,
-            "",
-            '<span class="text-cyan-300">Step 4/4: What\'s your message?</span>',
-            '<span class="text-yellow-200">  (Tell me what you\'d like to discuss)</span>',
-            "",
-          ],
-        };
-      } else if (contactForm.step === 4) {
-        // Step 4: Collecting message and show submitting animation
-        const submittingAnimation = [
-          `<span class="text-green-400">✓</span> <span class="text-cyan-300">Message:</span> <span class="text-white">${trimmedInput}</span>`,
-          "",
-          '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
-          '<span class="text-cyan-400">║</span>                    <span class="text-yellow-300 font-bold">SUBMITTING CONTACT</span>                        <span class="text-cyan-400">║</span>',
-          '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
-          "",
-          '<span class="text-green-400">� Processing your contact request...</span>',
-          "",
-          '<span class="text-blue-300">┌─────────────────────────────────────────────────────────────┐</span>',
-          '<span class="text-blue-300">│</span> <span class="text-yellow-300">Status:</span> <span class="text-yellow-400">Preparing submission...</span>                      <span class="text-blue-300">│</span>',
-          '<span class="text-blue-300">│</span>                                                             <span class="text-blue-300">│</span>',
-          '<span class="text-blue-300">│</span> <span class="text-gray-500">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span>     <span class="text-blue-300">│</span>',
-          '<span class="text-blue-300">│</span> <span class="text-yellow-400">0%</span> <span class="text-gray-400">Initializing...</span>                                    <span class="text-blue-300">│</span>',
-          '<span class="text-blue-300">└─────────────────────────────────────────────────────────────┘</span>',
-          "",
-        ];
-
-        // Store the completed form data temporarily
-        const completedForm = {
-          ...contactForm,
-          message: trimmedInput,
-        };
-
-        // Reset contact form and store completed data
-        this.state.contactForm = undefined;
-        this.state.completedContactForm = completedForm;
-
-        // Send email in background
-        this.sendContactEmail(completedForm);
-
-        return {
-          output: submittingAnimation,
-          startSubmitting: true,
-        };
-      }
+    const contactResult = await this.handleContactFormStep(trimmedInput, args);
+    if (contactResult) {
+      return contactResult;
     }
 
     // Check if we're in chat mode and it's not a special command
@@ -238,40 +319,7 @@ export class TerminalEngine {
       commandName !== "clear" &&
       commandName !== "bye"
     ) {
-      // Handle direct message to AI agent
-      if (this.state.chatSession.agent.id === "rudra-b") {
-        try {
-          const response = await geminiAPI.sendMessage(
-            trimmedInput,
-            this.repositories
-          );
-
-          // Add both messages to chat session
-          this.state.chatSession.messages.push(
-            {
-              role: "user",
-              content: trimmedInput,
-              timestamp: new Date(),
-            },
-            {
-              role: "assistant",
-              content: response,
-              timestamp: new Date(),
-            }
-          );
-
-          return {
-            output: [`🤖 Rudra-B: ${response}`],
-          };
-        } catch {
-          return {
-            output: [
-              "Sorry, I encountered an error while processing your request.",
-              "Please try again.",
-            ],
-          };
-        }
-      }
+      return this.handleChatMessage(trimmedInput);
     }
 
     const command = this.commands.get(commandName);
