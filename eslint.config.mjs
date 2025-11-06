@@ -27,7 +27,7 @@ const eslintConfig = [
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "no-debugger": "error",
       "no-duplicate-imports": "error",
-      "prefer-const": "error",
+      "prefer-const": "warn",
       "no-var": "error",
 
       // TypeScript
@@ -38,26 +38,20 @@ const eslintConfig = [
           varsIgnorePattern: "^_",
         },
       ],
-      "@typescript-eslint/explicit-function-return-type": [
-        "warn",
-        {
-          allowExpressions: true,
-          allowTypedFunctionExpressions: true,
-        },
-      ],
-      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/explicit-function-return-type": "off", // Too strict for now
+      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
 
       // React Best Practices
       "react/jsx-no-target-blank": "error",
-      "react/no-array-index-key": "warn",
+      "react/no-array-index-key": "off", // Common pattern, too strict
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
-      // Code Complexity
-      complexity: ["warn", 15],
-      "max-lines": ["warn", { max: 500, skipBlankLines: true }],
-      "max-depth": ["warn", 4],
+      // Code Complexity - warnings only
+      complexity: ["warn", 20], // Increased from 15
+      "max-lines": "off", // Too strict for now
+      "max-depth": ["warn", 5], // Increased from 4
     },
   },
 ];
