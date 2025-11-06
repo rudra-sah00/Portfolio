@@ -38,7 +38,7 @@ describe("Terminal Commands", () => {
   describe("helpCommand", () => {
     it("should show available commands", async () => {
       const result = await helpCommand.execute([], state);
-      expect(result.output.join("\n")).toContain("!help");
+      expect(result.output.join("\n")).toContain("help");
       expect(result.output.join("\n")).toContain("projects");
       expect(result.output.join("\n")).toContain("resume");
       expect(result.output.join("\n")).toContain("chat");

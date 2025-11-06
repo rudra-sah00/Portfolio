@@ -310,26 +310,6 @@ describe("TerminalEngine", () => {
       ).toBe(true);
     });
 
-    it("should handle Telegram contact method", async () => {
-      await engine.executeCommand("contact");
-      await engine.executeCommand("Charlie");
-
-      const result = await engine.executeCommand("Telegram");
-      expect(
-        result.output.some((line) => line.includes("Telegram username"))
-      ).toBe(true);
-    });
-
-    it("should handle Discord contact method", async () => {
-      await engine.executeCommand("contact");
-      await engine.executeCommand("Dave");
-
-      const result = await engine.executeCommand("Discord");
-      expect(
-        result.output.some((line) => line.includes("Discord username"))
-      ).toBe(true);
-    });
-
     it("should handle custom contact method", async () => {
       await engine.executeCommand("contact");
       await engine.executeCommand("Eve");

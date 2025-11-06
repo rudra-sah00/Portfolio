@@ -143,7 +143,7 @@ export class TerminalEngine {
         `<span class="text-green-400">✓</span> <span class="text-cyan-300">Name:</span> <span class="text-white">${trimmedInput}</span>`,
         "",
         '<span class="text-cyan-300">Step 2/4: What is your preferred contact method?</span>',
-        '<span class="text-yellow-200">  (e.g., email, LinkedIn, phone, WhatsApp, etc.)</span>',
+        '<span class="text-yellow-200">  (e.g., email, LinkedIn, phone, WhatsApp)</span>',
         "",
       ],
     };
@@ -183,10 +183,6 @@ export class TerminalEngine {
       return "Please provide your phone number:";
     } else if (lowerInput.includes("whatsapp")) {
       return "Please provide your WhatsApp number:";
-    } else if (lowerInput.includes("telegram")) {
-      return "Please provide your Telegram username:";
-    } else if (lowerInput.includes("discord")) {
-      return "Please provide your Discord username:";
     }
     return `Please provide your ${input} details:`;
   }
@@ -352,7 +348,7 @@ export class TerminalEngine {
       return {
         output: [
           `Command not found: ${commandName}`,
-          "Type !help for available commands.",
+          "Type help for available commands.",
         ],
       };
     }

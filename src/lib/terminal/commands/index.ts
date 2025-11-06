@@ -22,13 +22,13 @@ export const rootCommand: Command = {
 };
 
 export const helpCommand: Command = {
-  name: "!help",
+  name: "help",
   description: "Show available commands",
   execute: (args: string[], state: TerminalState): CommandResult => {
     const commands = [
       '<span class="text-cyan-400 font-bold">Available commands:</span>',
       "",
-      '  <span class="text-yellow-300">!help</span>     - <span class="text-gray-300">Show this help message</span>',
+      '  <span class="text-yellow-300">help</span>      - <span class="text-gray-300">Show this help message</span>',
       '  <span class="text-yellow-300">projects</span>  - <span class="text-gray-300">List all GitHub projects</span>',
       '  <span class="text-yellow-300">resume</span>    - <span class="text-gray-300">Download resume PDF</span>',
       '  <span class="text-yellow-300">chat</span>      - <span class="text-gray-300">Start chat with Rudra-B</span>',
