@@ -229,8 +229,8 @@ describe("GeminiAPI - Server-Side API Route", () => {
       const body = JSON.parse(fetchCall[1].body);
 
       expect(body.systemPrompt).toContain("Rudra-B");
-      expect(body.systemPrompt).toContain("portfolio");
-      expect(body.systemPrompt).toContain("ONLY answer questions");
+      expect(body.systemPrompt).toContain("Full-stack Developer");
+      expect(body.systemPrompt).toContain("AI assistant");
     });
 
     it("should generate project list from repositories", async () => {
