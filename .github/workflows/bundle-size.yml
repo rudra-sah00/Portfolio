@@ -37,10 +37,10 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Read Next.js build stats
             const buildDir = path.join(process.cwd(), '.next');
-            
+
             let comment = `## 📦 Bundle Size Report\n\n`;
             comment += `Build completed successfully!\n\n`;
             comment += `### Key Metrics:\n`;

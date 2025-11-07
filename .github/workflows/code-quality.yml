@@ -48,7 +48,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           TODO_COUNT=$(grep -r "TODO\|FIXME\|XXX\|HACK" src --include="*.ts" --include="*.tsx" | wc -l || echo "0")
           echo "Found $TODO_COUNT TODO/FIXME comments" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "$TODO_COUNT" -gt 0 ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Details:" >> $GITHUB_STEP_SUMMARY
