@@ -115,7 +115,7 @@ describe("Hero Component", () => {
 
     // Verify terminal opened successfully
     expect(
-      screen.getByText(/Type !help for available commands/i)
+      screen.getByText(/Type help for available commands/i)
     ).toBeInTheDocument();
   });
 
@@ -174,7 +174,7 @@ describe("Hero Component", () => {
 
     // Verify terminal opened state
     expect(
-      screen.getByText(/Type !help for available commands/i)
+      screen.getByText(/Type help for available commands/i)
     ).toBeInTheDocument();
   });
 

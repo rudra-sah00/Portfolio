@@ -214,7 +214,7 @@ const TerminalPopup = ({
         if (result.clear) {
           setHistory([
             "Welcome to Rudra's Terminal!",
-            "Type !help for available commands.",
+            "Type help for available commands.",
             "",
           ]);
         } else {
@@ -478,7 +478,7 @@ const TerminalPopup = ({
     terminalEngine.resetState();
     setHistory([
       "Welcome to Rudra's Terminal!",
-      "Type !help for available commands.",
+      "Type help for available commands.",
       "",
     ]);
     setCurrentInput("");
@@ -501,7 +501,7 @@ const TerminalPopup = ({
     if (isOpen) {
       setHistory([
         "Welcome to Rudra's Terminal!",
-        "Type !help for available commands.",
+        "Type help for available commands.",
         "",
       ]);
       // Focus the input when terminal opens
