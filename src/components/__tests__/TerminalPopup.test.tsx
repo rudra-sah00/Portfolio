@@ -95,7 +95,7 @@ describe("TerminalPopup Component", () => {
     fireEvent.click(minimizeButton);
 
     // Terminal body should be hidden when minimized
-    const terminalBody = screen.queryByText(/Type '!help'/i);
+    const terminalBody = screen.queryByText(/Type 'help'/i);
     expect(terminalBody).not.toBeInTheDocument();
   });
 
@@ -191,7 +191,7 @@ describe("TerminalPopup Component", () => {
     render(<TerminalPopup {...defaultProps} />);
 
     const welcomeMessage = screen.getByText(
-      /Type !help for available commands/i
+      /Type help for available commands/i
     );
     expect(welcomeMessage).toBeInTheDocument();
   });
@@ -875,10 +875,10 @@ describe("TerminalPopup Component", () => {
     ) as HTMLInputElement;
 
     if (input) {
-      await user.type(input, "!help{Enter}");
+      await user.type(input, "help{Enter}");
 
       await waitFor(() => {
-        expect(mockExecuteCommand).toHaveBeenCalledWith("!help");
+        expect(mockExecuteCommand).toHaveBeenCalledWith("help");
       });
     }
   });

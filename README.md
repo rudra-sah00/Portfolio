@@ -11,9 +11,9 @@ A cutting-edge, responsive portfolio built with **Next.js 15**, **TypeScript**, 
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.0-38B2AC)
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)
 [![CI/CD Pipeline](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/rudra-sah00/Portfolio/actions)
-[![codecov](https://codecov.io/gh/rudra-sah00/Portfolio/branch/main/graph/badge.svg)](https://codecov.io/gh/rudra-sah00/Portfolio)
-![Test Coverage](https://img.shields.io/badge/coverage-90.66%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-374%20passing-success)
+[![codecov](https://codecov.io/gh/rudra-sah00/Portfolio/graph/badge.svg?token=YOUR_CODECOV_TOKEN)](https://codecov.io/gh/rudra-sah00/Portfolio)
+![Test Coverage](https://img.shields.io/badge/coverage-90.99%25-brightgreen)
+![Tests](https://img.shields.io/badge/tests-390%20passing-success)
 
 ## ✨ Features
 

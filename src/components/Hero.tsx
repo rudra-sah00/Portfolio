@@ -118,7 +118,7 @@ const Hero = ({ repositories, loading }: HeroProps) => {
                       href="#"
                       className="btn-flip"
                       data-back="Terminal"
-                      data-front="!help"
+                      data-front="help"
                       onClick={handleTerminalClick}
                     ></a>
                   </div>
