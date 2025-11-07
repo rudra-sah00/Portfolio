@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build and analyze
-        run: ANALYZE=true npm run build
+      - name: Build application
+        run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
@@ -38,15 +38,19 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // Read Next.js build stats
+            // Read Next.js build output
             const buildDir = path.join(process.cwd(), '.next');
 
             let comment = `## 📦 Bundle Size Report\n\n`;
-            comment += `Build completed successfully!\n\n`;
-            comment += `### Key Metrics:\n`;
-            comment += `- First Load JS: Check Vercel deployment for details\n`;
-            comment += `- Build Time: Check workflow logs\n\n`;
-            comment += `💡 **Tip:** Keep first load JS under 200KB for optimal performance\n`;
+            comment += `✅ Build completed successfully!\n\n`;
+            comment += `### Build Info:\n`;
+            comment += `- Next.js production build completed\n`;
+            comment += `- Check the workflow logs for detailed size metrics\n\n`;
+            comment += `### Guidelines:\n`;
+            comment += `- 🎯 **First Load JS**: Aim for < 200KB\n`;
+            comment += `- ⚡ **Code Splitting**: Automatic with Next.js\n`;
+            comment += `- 🗜️ **Compression**: Enabled (gzip/brotli)\n\n`;
+            comment += `💡 **Tip:** Review the build output in workflow logs for page-by-page size breakdown\n`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,

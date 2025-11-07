@@ -304,9 +304,8 @@ jobs:
   deploy-preview:
     name: Deploy to Vercel (Preview)
     runs-on: ubuntu-latest
-    # Deploy preview for PRs after all checks pass
+    # Deploy preview for PRs (runs independently for faster feedback)
     if: github.event_name == 'pull_request'
-    needs: [lint-and-type-check, test, build, security-audit]
 
     steps:
       - name: Checkout code
