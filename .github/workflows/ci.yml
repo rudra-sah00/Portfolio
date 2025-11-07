@@ -164,24 +164,68 @@ jobs:
             const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
             const total = coverage.total;
 
+            // Thresholds
+            const thresholds = {
+              statements: 90,
+              branches: 85,
+              functions: 80,
+              lines: 90
+            };
+
             const getStatus = (pct, threshold) => {
               if (pct >= threshold) return '✅';
               if (pct >= threshold - 5) return '⚠️';
               return '❌';
             };
 
+            const getBar = (pct) => {
+              const filled = Math.round(pct / 5);
+              const empty = 20 - filled;
+              return '█'.repeat(filled) + '░'.repeat(empty);
+            };
+
+            const getDiff = (current, threshold) => {
+              const diff = current - threshold;
+              if (diff >= 0) return `+${diff.toFixed(1)}%`;
+              return `${diff.toFixed(1)}%`;
+            };
+
+            const allPassed = 
+              total.statements.pct >= thresholds.statements &&
+              total.branches.pct >= thresholds.branches &&
+              total.functions.pct >= thresholds.functions &&
+              total.lines.pct >= thresholds.lines;
+
             const comment = `## 📊 Test Coverage Report
 
-            | Metric | Coverage | Threshold | Status |
-            |--------|----------|-----------|--------|
-            | Statements | ${total.statements.pct.toFixed(2)}% | 80% | ${getStatus(total.statements.pct, 80)} |
-            | Branches | ${total.branches.pct.toFixed(2)}% | 70% | ${getStatus(total.branches.pct, 70)} |
-            | Functions | ${total.functions.pct.toFixed(2)}% | 68% | ${getStatus(total.functions.pct, 68)} |
-            | Lines | ${total.lines.pct.toFixed(2)}% | 80% | ${getStatus(total.lines.pct, 80)} |
+            ### Overall Status: ${allPassed ? '✅ **PASSED**' : '⚠️ **NEEDS ATTENTION**'}
 
-            **Total Tests:** ${Object.keys(coverage).length - 1} files tested
+            | Metric | Coverage | Visual | vs Target | Status |
+            |--------|----------|--------|-----------|--------|
+            | **Statements** | **${total.statements.pct.toFixed(2)}%** | ${getBar(total.statements.pct)} | ${getDiff(total.statements.pct, thresholds.statements)} | ${getStatus(total.statements.pct, thresholds.statements)} |
+            | **Branches** | **${total.branches.pct.toFixed(2)}%** | ${getBar(total.branches.pct)} | ${getDiff(total.branches.pct, thresholds.branches)} | ${getStatus(total.branches.pct, thresholds.branches)} |
+            | **Functions** | **${total.functions.pct.toFixed(2)}%** | ${getBar(total.functions.pct)} | ${getDiff(total.functions.pct, thresholds.functions)} | ${getStatus(total.functions.pct, thresholds.functions)} |
+            | **Lines** | **${total.lines.pct.toFixed(2)}%** | ${getBar(total.lines.pct)} | ${getDiff(total.lines.pct, thresholds.lines)} | ${getStatus(total.lines.pct, thresholds.lines)} |
 
-            ${total.statements.pct >= 80 && total.branches.pct >= 70 && total.functions.pct >= 68 ? '✅ **Coverage thresholds met!**' : '⚠️ **Some coverage thresholds not met**'}
+            ### 📈 Detailed Metrics
+            - **Total Files Tested:** ${Object.keys(coverage).length - 1}
+            - **Statements Covered:** ${total.statements.covered} / ${total.statements.total}
+            - **Branches Covered:** ${total.branches.covered} / ${total.branches.total}
+            - **Functions Covered:** ${total.functions.covered} / ${total.functions.total}
+            - **Lines Covered:** ${total.lines.covered} / ${total.lines.total}
+
+            ### 🎯 Target Thresholds
+            - Statements: ≥ ${thresholds.statements}%
+            - Branches: ≥ ${thresholds.branches}%
+            - Functions: ≥ ${thresholds.functions}%
+            - Lines: ≥ ${thresholds.lines}%
+
+            ${allPassed ? 
+              '✅ **Excellent!** All coverage thresholds exceeded. Great work! 🎉' : 
+              '⚠️ **Action Required:** Some coverage metrics are below target. Please add tests to improve coverage.'}
+
+            ---
+            <sub>💡 Tip: Run \`npm run test:coverage\` locally to see detailed coverage reports</sub>
             `;
 
             github.rest.issues.createComment({
@@ -304,9 +348,8 @@ jobs:
   deploy-preview:
     name: Deploy to Vercel (Preview)
     runs-on: ubuntu-latest
-    # Deploy preview for PRs after all checks pass
+    # Deploy preview for PRs (runs independently for faster feedback)
     if: github.event_name == 'pull_request'
-    needs: [lint-and-type-check, test, build, security-audit]
 
     steps:
       - name: Checkout code

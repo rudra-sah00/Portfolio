@@ -3,8 +3,6 @@ name: Lighthouse CI
 on:
   pull_request:
     branches: [develop, production]
-  push:
-    branches: [production]
 
 permissions:
   contents: read
@@ -34,6 +32,15 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://rudrasahoo.live' }}
 
+      - name: Start Next.js server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done' || exit 1
+
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
         with:
@@ -50,9 +57,9 @@ jobs:
         with:
           script: |
             const comment = `## ⚡ Lighthouse Performance Report
-            
+
             Check the full report in the workflow artifacts.
-            
+
             Target thresholds:
             - 🎯 Performance: ≥ 90
             - ♿ Accessibility: ≥ 95
