@@ -1,8 +1,9 @@
 name: Codecov Coverage Upload
 
+# This workflow is disabled - coverage upload is now handled in deploy-production.yml
+# Kept for reference only
 on:
-  push:
-    branches: [production]
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   coverage:
