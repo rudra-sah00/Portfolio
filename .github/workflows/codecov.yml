@@ -2,15 +2,13 @@ name: Codecov Coverage Upload
 
 on:
   push:
-    branches: [develop, production]
-  pull_request:
-    branches: [develop, production]
+    branches: [production]
 
 jobs:
   coverage:
     name: Upload Coverage to Codecov
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,7 +36,7 @@ jobs:
           name: codecov-portfolio
           fail_ci_if_error: true
           verbose: true
-          
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
