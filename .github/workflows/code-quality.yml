@@ -1,10 +1,10 @@
 name: Code Quality Analysis
 
 on:
-  push:
-    branches: [develop, production]
   pull_request:
     branches: [develop, production]
+  push:
+    branches: [develop]
 
 permissions:
   contents: read
