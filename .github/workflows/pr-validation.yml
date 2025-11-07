@@ -188,24 +188,39 @@ jobs:
 
             // If this is their first PR
             if (prs.length === 1) {
-              const welcomeMessage = `👋 Welcome @${creator}!
-              
-              Thank you for your first contribution to this project! 🎉
-              
-              Here's what happens next:
-              1. ✅ Automated checks will run on your PR
-              2. 👀 A maintainer will review your changes
-              3. 💬 They may request changes or approve
-              4. 🎊 Once approved, your PR will be merged!
-              
-              Feel free to ask questions if you need help. We're here to support you! 🚀`;
-              
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
+              // Check if welcome comment already exists
+              const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: welcomeMessage
+                issue_number: context.issue.number
               });
+              
+              const hasWelcomeComment = comments.some(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes('Welcome @' + creator)
+              );
+              
+              // Only post if no welcome comment exists
+              if (!hasWelcomeComment) {
+                const welcomeMessage = `👋 Welcome @${creator}!
+                
+                Thank you for your first contribution to this project! 🎉
+                
+                Here's what happens next:
+                1. ✅ Automated checks will run on your PR
+                2. 👀 A maintainer will review your changes
+                3. 💬 They may request changes or approve
+                4. 🎊 Once approved, your PR will be merged!
+                
+                Feel free to ask questions if you need help. We're here to support you! 🚀`;
+                
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: welcomeMessage
+                });
+              }
               
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
