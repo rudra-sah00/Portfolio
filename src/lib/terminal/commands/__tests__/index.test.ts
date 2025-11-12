@@ -66,18 +66,20 @@ describe("Terminal Commands", () => {
     it("should trigger multiple file downloads", async () => {
       const result = await codeCommand.execute([], state);
       expect(result.startDownload).toBe(true);
-      expect(result.output.join("\n")).toContain("AUTO DOWNLOAD FILES");
-      expect(result.output.join("\n")).toContain("New Folder/");
+      expect(result.output.join("\n")).toContain("PACKAGE PROJECT FILES");
+      expect(result.output.join("\n")).toContain("Project_Files.zip");
       expect(result.output.join("\n")).toContain("4 files");
     });
 
-    it("should list all files to be downloaded", async () => {
+    it("should list all files to be included in ZIP", async () => {
       const result = await codeCommand.execute([], state);
       const output = result.output.join("\n");
+      expect(output).toContain("Files to include");
       expect(output).toContain("New Doc X.txt");
       expect(output).toContain("New Text 1.txt");
       expect(output).toContain("New Text 2.txt");
       expect(output).toContain("New Text.txt");
+      expect(output).toContain("ZIP file will be downloaded");
     });
   });
 
