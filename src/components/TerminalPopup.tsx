@@ -357,8 +357,8 @@ const TerminalPopup = ({
                           const response = await fetch(file.href);
                           const blob = await response.blob();
                           zip.file(file.name, blob);
-                        } catch (error) {
-                          console.error(`Error fetching ${file.name}:`, error);
+                        } catch {
+                          // Silently skip files that fail to fetch
                         }
                       }
 
