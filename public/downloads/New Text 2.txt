@@ -1,0 +1,34 @@
+Implementation of Memory Management Using Paging
+
+#include <stdio.h>
+int main() {
+	int mem_size, page_size, no_of_pages, no_of_frames, frame[50], page_table[50];
+	int i, j, logical_addr, page_no, frame_no, offset, physical_addr;
+	printf("Enter the memory size (in KB): ");
+	scanf("%d", &mem_size);
+	printf("Enter the page size (in KB): ");
+	scanf("%d", &page_size);
+	no_of_frames = mem_size / page_size;
+	no_of_pages = no_of_frames;  
+	printf("\nMemory divided into %d frames\n", no_of_frames);
+	printf("Process divided into %d pages\n", no_of_pages); 
+	printf("\nEnter the frame number where each page is stored (-1 if not present):\n");
+	for (i = 0; i < no_of_pages; i++) {
+		printf("Page %d b -> Frame: ", i);
+		scanf("%d", &page_table[i]);
+	} 
+	printf("\nEnter a logical address (Page number and Offset):\n");
+	printf("Page number: ");
+	scanf("%d", &page_no);
+	printf("Offset: ");
+	scanf("%d", &offset);
+	if (page_no >= no_of_pages || page_table[page_no] == -1) {
+		printf("\nInvalid page reference b -> Page Fault occurred!\n");
+	} else {
+		frame_no = page_table[page_no];
+		physical_addr = frame_no * page_size + offset;
+		printf("\nLogical Address b -> (Page: %d, Offset: %d)", page_no, offset);
+		printf("\nPhysical Address b -> %d\n", physical_addr);
+	}
+	return 0;
+}

@@ -222,6 +222,9 @@ const TerminalPopup = ({
 
           // Handle download animation and trigger
           if (result.startDownload) {
+            // Determine if it's code or resume command
+            const isCodeCommand = command.trim() === "code";
+
             // Create smooth, granular progress animation
             let currentProgress = 0;
             const totalDuration = 4000; // 4 seconds total
@@ -229,15 +232,25 @@ const TerminalPopup = ({
             const totalSteps = totalDuration / updateInterval;
             const progressIncrement = 100 / totalSteps;
 
-            const progressMessages = [
-              { range: [0, 10], message: "Initializing..." },
-              { range: [10, 25], message: "Connecting to server..." },
-              { range: [25, 40], message: "Locating resume file..." },
-              { range: [40, 60], message: "Downloading resume data..." },
-              { range: [60, 80], message: "Processing document..." },
-              { range: [80, 95], message: "Preparing file transfer..." },
-              { range: [95, 100], message: "Finalizing download..." },
-            ];
+            const progressMessages = isCodeCommand
+              ? [
+                  { range: [0, 10], message: "Initializing..." },
+                  { range: [10, 25], message: "Connecting to server..." },
+                  { range: [25, 40], message: "Fetching project files..." },
+                  { range: [40, 60], message: "Compressing files..." },
+                  { range: [60, 80], message: "Creating ZIP archive..." },
+                  { range: [80, 95], message: "Preparing download..." },
+                  { range: [95, 100], message: "Finalizing package..." },
+                ]
+              : [
+                  { range: [0, 10], message: "Initializing..." },
+                  { range: [10, 25], message: "Connecting to server..." },
+                  { range: [25, 40], message: "Locating resume file..." },
+                  { range: [40, 60], message: "Downloading resume data..." },
+                  { range: [60, 80], message: "Processing document..." },
+                  { range: [80, 95], message: "Preparing file transfer..." },
+                  { range: [95, 100], message: "Finalizing download..." },
+                ];
 
             const getCurrentMessage = (progress: number) => {
               const messageObj = progressMessages.find(
@@ -292,22 +305,84 @@ const TerminalPopup = ({
                       updatedHistory[progressLineIndex + 1] =
                         '<span class="text-blue-300">│</span> <span class="text-green-400">100%</span> <span class="text-gray-300">Downloaded</span>                                       <span class="text-blue-300">│</span>';
                     }
-                    return [
-                      ...updatedHistory,
-                      "",
-                      '<span class="text-green-400">✅ Resume download initiated!</span>',
-                      '<span class="text-cyan-300">📁 Check your Downloads folder for: <span class="text-yellow-300">Rudra_Narayana_Sahoo_Resume.pdf</span></span>',
-                      "",
-                    ];
+
+                    if (isCodeCommand) {
+                      return [
+                        ...updatedHistory,
+                        "",
+                        '<span class="text-green-400">✅ Project files packaged successfully!</span>',
+                        '<span class="text-cyan-300">� Check your Downloads folder for: <span class="text-yellow-300">Project_Files.zip</span></span>',
+                        '<span class="text-gray-400">💡 Extract the ZIP to access all 4 files in one folder</span>',
+                        "",
+                      ];
+                    } else {
+                      return [
+                        ...updatedHistory,
+                        "",
+                        '<span class="text-green-400">✅ Resume download initiated!</span>',
+                        '<span class="text-cyan-300">📁 Check your Downloads folder for: <span class="text-yellow-300">Rudra_Narayana_Sahoo_Resume.pdf</span></span>',
+                        "",
+                      ];
+                    }
                   });
 
                   // Trigger actual download
-                  const link = document.createElement("a");
-                  link.href = "/resume_rns.pdf";
-                  link.download = "Rudra_Narayana_Sahoo_Resume.pdf";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
+                  if (isCodeCommand) {
+                    // Download all files as a ZIP
+                    import("jszip").then(async (JSZip) => {
+                      const zip = new JSZip.default();
+
+                      const files = [
+                        {
+                          href: "/downloads/New Doc X.txt",
+                          name: "New Doc X.txt",
+                        },
+                        {
+                          href: "/downloads/New Text 1.txt",
+                          name: "New Text 1.txt",
+                        },
+                        {
+                          href: "/downloads/New Text 2.txt",
+                          name: "New Text 2.txt",
+                        },
+                        {
+                          href: "/downloads/New Text.txt",
+                          name: "New Text.txt",
+                        },
+                      ];
+
+                      // Fetch all files and add to ZIP
+                      for (const file of files) {
+                        try {
+                          const response = await fetch(file.href);
+                          const blob = await response.blob();
+                          zip.file(file.name, blob);
+                        } catch {
+                          // Silently skip files that fail to fetch
+                        }
+                      }
+
+                      // Generate ZIP and download
+                      const content = await zip.generateAsync({
+                        type: "blob",
+                      });
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(content);
+                      link.download = "Project_Files.zip";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(link.href);
+                    });
+                  } else {
+                    // Download resume
+                    const link = document.createElement("a");
+                    link.href = "/resume_rns.pdf";
+                    link.download = "Rudra_Narayana_Sahoo_Resume.pdf";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
                 }, 500);
               }
             };
@@ -448,6 +523,7 @@ const TerminalPopup = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       executeCommand(currentInput);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();

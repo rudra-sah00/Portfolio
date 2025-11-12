@@ -2,33 +2,117 @@
 
 This directory contains all GitHub Actions workflows for the Portfolio project.
 
+## 🌳 Branch Strategy
+
+- **`production`** - Default branch, production-ready code deployed to https://rudrasahoo.live
+- **`develop`** - Working branch for active development and testing
+
 ## 📋 Workflows Overview
 
 ### 1. **CI/CD Pipeline** (`ci.yml`)
 
-**Triggers:** Push to main/develop, Pull Requests to main/develop
+**Triggers:** Push to develop, Pull Requests
 
 **Jobs:**
 
 - ✅ **Lint & Type Check** - ESLint, Prettier, TypeScript validation
-- ✅ **Test & Coverage** - Jest tests with coverage reports (100% pass rate!)
+- ✅ **Test & Coverage** - Jest tests with enhanced coverage reports (390 tests, 90.99% coverage!)
 - ✅ **Build** - Next.js production build verification
 - ✅ **Security Audit** - npm audit for vulnerabilities
-- ✅ **PR Status Check** - Final status for PRs with auto-comment
 
 **Features:**
 
-- Runs on all PRs (open, sync, reopen, ready_for_review)
+- Visual coverage reports with progress bars and diff indicators
+- Detailed metrics breakdown (statements, branches, functions, lines)
+- Comments coverage summary on PRs with comparison to base
 - Skips draft PRs to save CI minutes
-- Uploads coverage reports to Codecov
-- Comments coverage summary on PRs
 - Concurrency control to cancel outdated runs
+- Only runs on develop pushes and PRs (not production)
+
+**Coverage Thresholds:** 90% statements, 85% branches, 80% functions, 90% lines
 
 **Required Checks:** All jobs must pass for PR merge
 
 ---
 
-### 2. **PR Validation** (`pr-validation.yml`)
+### 2. **Deploy to Production** (`deploy-production.yml`)
+
+**Triggers:** Push to production branch only
+
+**Jobs (Sequential):**
+
+1. ✅ **Quality Checks** - Lint, format check, type check
+2. 🧪 **Test & Coverage** - Full test suite + Codecov upload
+3. 🏗️ **Build** - Production build verification
+4. 🚀 **Deploy** - Vercel production deployment
+
+**Features:**
+
+- Sequential execution ensures each step completes before next
+- Comprehensive quality gates before deployment
+- Integrated Codecov reporting
+- Only one workflow runs on production push (no parallel workflows)
+
+**Environment:** Production (https://rudrasahoo.live)
+
+---
+
+### 3. **Deploy Preview** (`deploy-preview.yml`)
+
+**Triggers:** Pull Requests only
+
+**Jobs:**
+
+- 🔍 **Deploy Preview** - Vercel preview deployment for PRs
+- Independent workflow for faster feedback
+- No deployment on production pushes
+
+---
+
+### 4. **Code Quality** (`code-quality.yml`)
+
+**Triggers:** Push to develop, Pull Requests
+
+**Jobs:**
+
+- 🎨 **Format Check** - Prettier validation
+- 📏 **Lint** - ESLint checks
+- 🔍 **Type Check** - TypeScript compiler validation
+
+**Features:**
+
+- Comprehensive code quality enforcement
+- Pre-commit validation mirror
+- Does not run on production branch
+
+---
+
+### 5. **Lighthouse CI** (`lighthouse.yml`)
+
+**Triggers:** Pull Requests only
+
+**Jobs:**
+
+- 💡 **Performance Testing** - Google Lighthouse audits
+- Checks performance, accessibility, best practices, SEO
+- Starts Next.js server with health check before testing
+- Results uploaded to temporary public storage
+
+---
+
+### 6. **Bundle Size Check** (`bundle-size.yml`)
+
+**Triggers:** Pull Requests only
+
+**Jobs:**
+
+- 📦 **Bundle Analysis** - Reports on bundle sizes
+- Tracks size changes in PRs
+- Uses standard Next.js build output
+
+---
+
+### 7. **PR Validation** (`pr-validation.yml`)
 
 **Triggers:** PR opened, edited, synchronized, reopened
 
@@ -36,7 +120,6 @@ This directory contains all GitHub Actions workflows for the Portfolio project.
 
 - 📝 **PR Metadata Check** - Validates PR title follows conventional commits
 - 🏷️ **Auto Label** - Automatically adds relevant labels based on changed files
-- 👋 **PR Welcome** - Welcomes first-time contributors
 
 **Auto Labels:**
 
@@ -57,21 +140,19 @@ Must start with: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chor
 
 ---
 
-### 3. **Deploy to Production** (`deploy.yml`)
+### 8. **Welcome Contributors** (`welcome-contributors.yml`)
 
-**Triggers:** Push to main, Manual dispatch
+**Triggers:** Pull Requests (pull_request_target)
 
 **Jobs:**
 
-- 🚀 **Deploy to Vercel** - Production deployment verification
-- Runs full test suite before deployment
-- Creates deployment success notifications
-
-**Environment:** Production (https://rudrasahoo.live)
+- � **Welcome Message** - Welcomes first-time contributors
+- Adds `first-time contributor` label
+- Checks for duplicate comments to avoid spam
 
 ---
 
-### 4. **Stale PR Management** (`stale.yml`)
+### 9. **Stale PR Management** (`stale.yml`)
 
 **Triggers:** Daily at 00:00 UTC, Manual dispatch
 
@@ -85,7 +166,7 @@ Must start with: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chor
 
 ---
 
-### 5. **Dependency Updates** (`dependencies.yml`)
+### 10. **Dependency Updates** (`dependencies.yml`)
 
 **Triggers:** Weekly on Mondays at 09:00 UTC, Manual dispatch
 
@@ -96,6 +177,16 @@ Must start with: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chor
 - Provides table with current, wanted, and latest versions
 
 **Labels:** `dependencies`, `maintenance`
+
+---
+
+### 11. **Codecov Upload** (`codecov.yml`)
+
+**Triggers:** Manual dispatch only (workflow_dispatch)
+
+**Status:** Disabled for automatic runs
+
+**Reason:** Coverage upload now integrated into production deployment workflow test job
 
 ---
 
@@ -115,22 +206,32 @@ Must start with: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chor
    - 🔄 Size label added
 
 3. **CI Pipeline Runs**
-   - Lint & Type Check
-   - Tests (100% coverage!)
+   - Code quality checks (lint, format, types)
+   - Full test suite (390 tests, 90.99% coverage!)
    - Build verification
    - Security audit
+   - Lighthouse performance testing
+   - Bundle size analysis
+   - Preview deployment
 
 4. **Coverage Report**
-   - Comment added to PR with coverage metrics
-   - Codecov integration for detailed reports
+   - Visual progress bars with coverage metrics
+   - Diff indicators showing coverage changes
+   - Detailed breakdown by category
+   - Comparison to base branch
 
 5. **Ready for Review**
    - All checks must pass ✅
-   - Auto-comment confirms PR is ready
+   - No "skipped" deployment statuses
+   - Preview deployment available for testing
 
-6. **Merge to Main**
-   - Deployment workflow triggers
-   - Application deploys to production
+6. **Merge to Production**
+   - Sequential workflow triggers:
+     1. Quality checks (lint, format, type)
+     2. Tests + Codecov upload
+     3. Production build
+     4. Vercel deployment
+   - Application deploys to https://rudrasahoo.live
 
 ### For Reviewers:
 
@@ -154,7 +255,7 @@ NEXT_PUBLIC_SITE_URL  # Optional, defaults to https://rudrasahoo.live
 
 ### Branch Protection Rules
 
-Recommended settings for `main` branch:
+Recommended settings for `production` branch (default):
 
 - ✅ Require pull request before merging
 - ✅ Require approvals: 1
@@ -164,9 +265,18 @@ Recommended settings for `main` branch:
   - `Test & Coverage`
   - `Build Application`
   - `Security Audit`
+  - `Code Quality`
+  - `Lighthouse CI`
+  - `Bundle Size Check`
 - ✅ Require conversation resolution
 - ✅ Require linear history
 - ✅ Include administrators
+
+Recommended settings for `develop` branch:
+
+- ✅ Require pull request before merging
+- ✅ Require status checks to pass (basic set)
+- Allow force pushes (for rebasing)
 
 ---
 
@@ -175,9 +285,10 @@ Recommended settings for `main` branch:
 Add these to your README.md:
 
 ```markdown
-![CI/CD](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg)
-![PR Validation](https://github.com/rudra-sah00/Portfolio/workflows/PR%20Validation/badge.svg)
-![Deploy](https://github.com/rudra-sah00/Portfolio/workflows/Deploy%20to%20Production/badge.svg)
+![CI/CD](https://github.com/rudra-sah00/Portfolio/workflows/CI%2FCD%20Pipeline/badge.svg?branch=production)
+![Deploy Production](https://github.com/rudra-sah00/Portfolio/workflows/Deploy%20to%20Production/badge.svg?branch=production)
+![Code Quality](https://github.com/rudra-sah00/Portfolio/workflows/Code%20Quality/badge.svg?branch=production)
+![Codecov](https://codecov.io/gh/rudra-sah00/Portfolio/branch/production/graph/badge.svg?token=YOUR_CODECOV_TOKEN)
 ```
 
 ---
@@ -224,7 +335,7 @@ Some workflows can be triggered manually:
 
 Manually triggerable workflows:
 
-- Deploy to Production
+- Codecov Upload (disabled for automatic runs)
 - Stale PR Management
 - Dependency Updates
 
@@ -234,14 +345,23 @@ Manually triggerable workflows:
 
 ### Current Test Status
 
-- **Total Tests:** 159
-- **Passing:** 159 ✅
+- **Total Tests:** 390
+- **Passing:** 390 ✅
 - **Pass Rate:** 100% 🎉
-- **Coverage:** High (see Codecov for details)
+- **Coverage:** 90.99% (see Codecov for detailed reports)
+  - Statements: 90.99%
+  - Branches: 85.05%
+  - Functions: 85.93%
+  - Lines: 91.31%
 
 ### CI Performance
 
-- **Average Run Time:** ~2 minutes
+- **PR Workflows:** Run in parallel for fast feedback (~3-4 minutes)
+- **Production Workflow:** Sequential execution (~5-6 minutes total)
+  - Quality Checks: ~1 minute
+  - Tests: ~2 minutes
+  - Build: ~1.5 minutes
+  - Deploy: ~30 seconds
 - **Concurrency:** Enabled (cancels outdated runs)
 - **Caching:** npm dependencies cached
 
@@ -267,7 +387,19 @@ Manually triggerable workflows:
 - Verify dependencies are installed correctly
 - Review build logs for specific errors
 
-**4. Stale Bot Not Working**
+**4. Lighthouse CI Fails**
+
+- Verify server starts successfully
+- Check health check endpoint responds
+- Increase timeout if needed
+
+**5. Bundle Size Check Issues**
+
+- Ensure standard build completes
+- Do not use ANALYZE flag
+- Check next.config.ts configuration
+
+**6. Stale Bot Not Working**
 
 - Check workflow is enabled
 - Verify GITHUB_TOKEN permissions
@@ -305,7 +437,46 @@ Manually triggerable workflows:
 
 ---
 
-**Last Updated:** October 10, 2025  
+## 🔄 Workflow Architecture
+
+### PR Workflow (Parallel Execution)
+
+When you open a PR, these workflows run **in parallel** for fast feedback:
+
+```
+Pull Request Opened
+├── CI/CD Pipeline (lint, test, build, security)
+├── Code Quality (format, lint, types)
+├── Lighthouse CI (performance testing)
+├── Bundle Size Check
+├── Deploy Preview (Vercel)
+├── PR Validation (labels, title check)
+└── Welcome Contributors (first-time only)
+```
+
+### Production Deployment (Sequential Execution)
+
+When you merge to production, **one workflow** runs these jobs **sequentially**:
+
+```
+Push to Production Branch
+└── Deploy to Production Workflow
+    ├── 1️⃣ Quality Checks (lint, format, types)
+    ├── 2️⃣ Test & Coverage (390 tests + Codecov)
+    ├── 3️⃣ Build (Next.js production build)
+    └── 4️⃣ Deploy (Vercel production)
+```
+
+This ensures:
+
+- ✅ No parallel workflows clogging the Actions tab
+- ✅ Each step completes before next begins
+- ✅ Clear linear progression
+- ✅ Fails fast if any step fails
+
+---
+
+**Last Updated:** November 8, 2025  
 **Maintained By:** @rudra-sah00
 
 For questions or issues with workflows, please open an issue with the `ci/cd` label.

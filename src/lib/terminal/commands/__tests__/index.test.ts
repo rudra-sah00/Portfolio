@@ -2,6 +2,7 @@ import {
   rootCommand,
   helpCommand,
   resumeCommand,
+  codeCommand,
   clearCommand,
   homeCommand,
   byeCommand,
@@ -41,6 +42,7 @@ describe("Terminal Commands", () => {
       expect(result.output.join("\n")).toContain("help");
       expect(result.output.join("\n")).toContain("projects");
       expect(result.output.join("\n")).toContain("resume");
+      expect(result.output.join("\n")).toContain("code");
       expect(result.output.join("\n")).toContain("chat");
     });
 
@@ -57,6 +59,25 @@ describe("Terminal Commands", () => {
       const result = await resumeCommand.execute([], state);
       expect(result.startDownload).toBe(true);
       expect(result.output.join("\n")).toContain("RESUME DOWNLOAD");
+    });
+  });
+
+  describe("codeCommand", () => {
+    it("should trigger multiple file downloads", async () => {
+      const result = await codeCommand.execute([], state);
+      expect(result.startDownload).toBe(true);
+      expect(result.output.join("\n")).toContain("AUTO DOWNLOAD FILES");
+      expect(result.output.join("\n")).toContain("New Folder/");
+      expect(result.output.join("\n")).toContain("4 files");
+    });
+
+    it("should list all files to be downloaded", async () => {
+      const result = await codeCommand.execute([], state);
+      const output = result.output.join("\n");
+      expect(output).toContain("New Doc X.txt");
+      expect(output).toContain("New Text 1.txt");
+      expect(output).toContain("New Text 2.txt");
+      expect(output).toContain("New Text.txt");
     });
   });
 
