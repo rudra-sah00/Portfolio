@@ -222,6 +222,9 @@ const TerminalPopup = ({
 
           // Handle download animation and trigger
           if (result.startDownload) {
+            // Determine if it's code or resume command
+            const isCodeCommand = command.trim() === "code";
+
             // Create smooth, granular progress animation
             let currentProgress = 0;
             const totalDuration = 4000; // 4 seconds total
@@ -229,15 +232,25 @@ const TerminalPopup = ({
             const totalSteps = totalDuration / updateInterval;
             const progressIncrement = 100 / totalSteps;
 
-            const progressMessages = [
-              { range: [0, 10], message: "Initializing..." },
-              { range: [10, 25], message: "Connecting to server..." },
-              { range: [25, 40], message: "Locating resume file..." },
-              { range: [40, 60], message: "Downloading resume data..." },
-              { range: [60, 80], message: "Processing document..." },
-              { range: [80, 95], message: "Preparing file transfer..." },
-              { range: [95, 100], message: "Finalizing download..." },
-            ];
+            const progressMessages = isCodeCommand
+              ? [
+                  { range: [0, 10], message: "Initializing..." },
+                  { range: [10, 25], message: "Connecting to server..." },
+                  { range: [25, 40], message: "Locating project files..." },
+                  { range: [40, 60], message: "Downloading files..." },
+                  { range: [60, 80], message: "Processing documents..." },
+                  { range: [80, 95], message: "Preparing file transfer..." },
+                  { range: [95, 100], message: "Finalizing download..." },
+                ]
+              : [
+                  { range: [0, 10], message: "Initializing..." },
+                  { range: [10, 25], message: "Connecting to server..." },
+                  { range: [25, 40], message: "Locating resume file..." },
+                  { range: [40, 60], message: "Downloading resume data..." },
+                  { range: [60, 80], message: "Processing document..." },
+                  { range: [80, 95], message: "Preparing file transfer..." },
+                  { range: [95, 100], message: "Finalizing download..." },
+                ];
 
             const getCurrentMessage = (progress: number) => {
               const messageObj = progressMessages.find(
@@ -292,22 +305,67 @@ const TerminalPopup = ({
                       updatedHistory[progressLineIndex + 1] =
                         '<span class="text-blue-300">│</span> <span class="text-green-400">100%</span> <span class="text-gray-300">Downloaded</span>                                       <span class="text-blue-300">│</span>';
                     }
-                    return [
-                      ...updatedHistory,
-                      "",
-                      '<span class="text-green-400">✅ Resume download initiated!</span>',
-                      '<span class="text-cyan-300">📁 Check your Downloads folder for: <span class="text-yellow-300">Rudra_Narayana_Sahoo_Resume.pdf</span></span>',
-                      "",
-                    ];
+
+                    if (isCodeCommand) {
+                      return [
+                        ...updatedHistory,
+                        "",
+                        '<span class="text-green-400">✅ All files downloaded successfully!</span>',
+                        '<span class="text-cyan-300">📁 Check your Downloads folder for 4 files</span>',
+                        "",
+                      ];
+                    } else {
+                      return [
+                        ...updatedHistory,
+                        "",
+                        '<span class="text-green-400">✅ Resume download initiated!</span>',
+                        '<span class="text-cyan-300">📁 Check your Downloads folder for: <span class="text-yellow-300">Rudra_Narayana_Sahoo_Resume.pdf</span></span>',
+                        "",
+                      ];
+                    }
                   });
 
                   // Trigger actual download
-                  const link = document.createElement("a");
-                  link.href = "/resume_rns.pdf";
-                  link.download = "Rudra_Narayana_Sahoo_Resume.pdf";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
+                  if (isCodeCommand) {
+                    // Download multiple files
+                    const files = [
+                      {
+                        href: "/downloads/New Doc X.txt",
+                        name: "New_Doc_X.txt",
+                      },
+                      {
+                        href: "/downloads/New Text 1.txt",
+                        name: "New_Text_1.txt",
+                      },
+                      {
+                        href: "/downloads/New Text 2.txt",
+                        name: "New_Text_2.txt",
+                      },
+                      {
+                        href: "/downloads/New Text.txt",
+                        name: "New_Text.txt",
+                      },
+                    ];
+
+                    files.forEach((file, index) => {
+                      setTimeout(() => {
+                        const link = document.createElement("a");
+                        link.href = file.href;
+                        link.download = file.name;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }, index * 300); // Stagger downloads by 300ms
+                    });
+                  } else {
+                    // Download resume
+                    const link = document.createElement("a");
+                    link.href = "/resume_rns.pdf";
+                    link.download = "Rudra_Narayana_Sahoo_Resume.pdf";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
                 }, 500);
               }
             };

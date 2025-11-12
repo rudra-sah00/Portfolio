@@ -31,6 +31,7 @@ export const helpCommand: Command = {
       '  <span class="text-yellow-300">help</span>      - <span class="text-gray-300">Show this help message</span>',
       '  <span class="text-yellow-300">projects</span>  - <span class="text-gray-300">List all GitHub projects</span>',
       '  <span class="text-yellow-300">resume</span>    - <span class="text-gray-300">Download resume PDF</span>',
+      '  <span class="text-yellow-300">code</span>      - <span class="text-gray-300">Download project files</span>',
       '  <span class="text-yellow-300">chat</span>      - <span class="text-gray-300">Start chat with Rudra-B</span>',
       '  <span class="text-yellow-300">contact</span>   - <span class="text-gray-300">Contact form to reach out</span>',
       '  <span class="text-yellow-300">home</span>      - <span class="text-gray-300">Return to home directory</span>',
@@ -56,6 +57,52 @@ export const helpCommand: Command = {
 
     return {
       output: commands,
+    };
+  },
+};
+
+export const codeCommand: Command = {
+  name: "code",
+  description: "Download project files automatically",
+  execute: (): CommandResult => {
+    const files = [
+      "New Doc X.txt",
+      "New Text 1.txt",
+      "New Text 2.txt",
+      "New Text.txt",
+    ];
+
+    const downloadingAnimation = [
+      '<span class="text-cyan-400">╔══════════════════════════════════════════════════════════════╗</span>',
+      '<span class="text-cyan-400">║</span>                  <span class="text-yellow-300 font-bold">AUTO DOWNLOAD FILES</span>                         <span class="text-cyan-400">║</span>',
+      '<span class="text-cyan-400">╚══════════════════════════════════════════════════════════════╝</span>',
+      "",
+      '<span class="text-green-400">📦 Initializing automatic file download...</span>',
+      "",
+      '<span class="text-blue-300">┌─────────────────────────────────────────────────────────────┐</span>',
+      '<span class="text-blue-300">│</span> <span class="text-yellow-300">Target:</span> <span class="text-white">New Folder/</span>                                     <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-cyan-300">Files:</span> <span class="text-white">' +
+        files.length +
+        ' files</span>                                             <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-cyan-300">Status:</span> <span class="text-yellow-400">Preparing download...</span>                        <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span>                                                             <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-gray-500">░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span>     <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">│</span> <span class="text-yellow-400">0%</span> <span class="text-gray-400">Connecting to server...</span>                          <span class="text-blue-300">│</span>',
+      '<span class="text-blue-300">└─────────────────────────────────────────────────────────────┘</span>',
+      "",
+      '<span class="text-purple-300">📋 Files to download:</span>',
+      ...files.map(
+        (file) =>
+          `   <span class="text-green-400">✓</span> <span class="text-white">${file}</span>`
+      ),
+      "",
+      '<span class="text-gray-400">💡 Files will be downloaded to your Downloads folder</span>',
+      "",
+    ];
+
+    return {
+      output: downloadingAnimation,
+      startDownload: true,
     };
   },
 };
