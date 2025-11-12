@@ -236,11 +236,11 @@ const TerminalPopup = ({
               ? [
                   { range: [0, 10], message: "Initializing..." },
                   { range: [10, 25], message: "Connecting to server..." },
-                  { range: [25, 40], message: "Locating project files..." },
-                  { range: [40, 60], message: "Downloading files..." },
-                  { range: [60, 80], message: "Processing documents..." },
-                  { range: [80, 95], message: "Preparing file transfer..." },
-                  { range: [95, 100], message: "Finalizing download..." },
+                  { range: [25, 40], message: "Fetching project files..." },
+                  { range: [40, 60], message: "Compressing files..." },
+                  { range: [60, 80], message: "Creating ZIP archive..." },
+                  { range: [80, 95], message: "Preparing download..." },
+                  { range: [95, 100], message: "Finalizing package..." },
                 ]
               : [
                   { range: [0, 10], message: "Initializing..." },
@@ -310,8 +310,9 @@ const TerminalPopup = ({
                       return [
                         ...updatedHistory,
                         "",
-                        '<span class="text-green-400">✅ All files downloaded successfully!</span>',
-                        '<span class="text-cyan-300">📁 Check your Downloads folder for 4 files</span>',
+                        '<span class="text-green-400">✅ Project files packaged successfully!</span>',
+                        '<span class="text-cyan-300">� Check your Downloads folder for: <span class="text-yellow-300">Project_Files.zip</span></span>',
+                        '<span class="text-gray-400">💡 Extract the ZIP to access all 4 files in one folder</span>',
                         "",
                       ];
                     } else {
@@ -327,35 +328,51 @@ const TerminalPopup = ({
 
                   // Trigger actual download
                   if (isCodeCommand) {
-                    // Download multiple files
-                    const files = [
-                      {
-                        href: "/downloads/New Doc X.txt",
-                        name: "New_Doc_X.txt",
-                      },
-                      {
-                        href: "/downloads/New Text 1.txt",
-                        name: "New_Text_1.txt",
-                      },
-                      {
-                        href: "/downloads/New Text 2.txt",
-                        name: "New_Text_2.txt",
-                      },
-                      {
-                        href: "/downloads/New Text.txt",
-                        name: "New_Text.txt",
-                      },
-                    ];
+                    // Download all files as a ZIP
+                    import("jszip").then(async (JSZip) => {
+                      const zip = new JSZip.default();
 
-                    files.forEach((file, index) => {
-                      setTimeout(() => {
-                        const link = document.createElement("a");
-                        link.href = file.href;
-                        link.download = file.name;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }, index * 300); // Stagger downloads by 300ms
+                      const files = [
+                        {
+                          href: "/downloads/New Doc X.txt",
+                          name: "New Doc X.txt",
+                        },
+                        {
+                          href: "/downloads/New Text 1.txt",
+                          name: "New Text 1.txt",
+                        },
+                        {
+                          href: "/downloads/New Text 2.txt",
+                          name: "New Text 2.txt",
+                        },
+                        {
+                          href: "/downloads/New Text.txt",
+                          name: "New Text.txt",
+                        },
+                      ];
+
+                      // Fetch all files and add to ZIP
+                      for (const file of files) {
+                        try {
+                          const response = await fetch(file.href);
+                          const blob = await response.blob();
+                          zip.file(file.name, blob);
+                        } catch (error) {
+                          console.error(`Error fetching ${file.name}:`, error);
+                        }
+                      }
+
+                      // Generate ZIP and download
+                      const content = await zip.generateAsync({
+                        type: "blob",
+                      });
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(content);
+                      link.download = "Project_Files.zip";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(link.href);
                     });
                   } else {
                     // Download resume
@@ -506,6 +523,7 @@ const TerminalPopup = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       executeCommand(currentInput);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
