@@ -137,7 +137,7 @@ export default function StreamingProject() {
             Project
             <br />
             <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
-              02
+              01
             </span>
           </h1>
 

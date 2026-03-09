@@ -249,7 +249,7 @@ export default function CosmicWatchProject() {
             Project
             <br />
             <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-              01
+              02
             </span>
           </h1>
 

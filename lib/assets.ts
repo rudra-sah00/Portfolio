@@ -60,3 +60,17 @@ export const COSMIC_WATCH = {
   alerts: `${CDN_BASE}/v1773043506/alerts_cpp71x.png`,
   explorer3d: `${CDN_VIDEO}/v1773043510/3d-explorer_zwr6hx.mp4`,
 } as const;
+
+// ─── Trading ChartPro ────────────────────────────────────
+export const TRADING_CHART = {
+  hero: `${CDN_BASE}/v1773065786/project-hero_ct3xh3.png`,
+} as const;
+
+// ─── MyChess Backend ─────────────────────────────────────
+export const MYCHESS = {
+  hero: `${CDN_BASE}/v1773076389/project-hero_hluz1s.png`,
+  dashboard: `${CDN_BASE}/v1773076388/project-content1_qmx9jw.png`,
+  playWithBot: `${CDN_BASE}/v1773076387/project-content2_ibsq0z.png`,
+  playerPage: `${CDN_BASE}/v1773076387/project-content3_md7cld.png`,
+  matchHistory: `${CDN_BASE}/v1773076387/project-content4_ztqn9b.png`,
+} as const;

@@ -1,4 +1,5 @@
 import BottomNav from "./components/BottomNav";
+import Certifications from "./components/Certifications";
 import Contact from "./components/Contact";
 import Hero from "./components/Hero";
 import Infrastructure from "./components/Infrastructure";
@@ -15,6 +16,7 @@ export default function Home() {
         <Infrastructure />
         <Projects />
         <Work />
+        <Certifications />
         <Contact />
 
         {/* Footer */}
