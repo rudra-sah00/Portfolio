@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 
-const prs = [
+interface PR {
+  number: number;
+  title: string;
+  type: string;
+  date: string;
+  url: string;
+}
+
+const adminPRs: PR[] = [
   {
     number: 6392,
     title: "btn alignment issue fixed",
@@ -96,6 +104,16 @@ const prs = [
   },
 ];
 
+const apiPRs: PR[] = [
+  {
+    number: 3970,
+    title: "feat: implement refresh token support for authentication (Stage 1)",
+    type: "feat",
+    date: "Dec 16, 2025",
+    url: "https://github.com/PalisadoesFoundation/talawa-api/pull/3970",
+  },
+];
+
 const typeStyle: Record<string, string> = {
   feat: "text-emerald-400 bg-emerald-400/10",
   fix: "text-amber-400 bg-amber-400/10",
@@ -103,12 +121,11 @@ const typeStyle: Record<string, string> = {
   chore: "text-white/30 bg-white/[0.04]",
 };
 
-export default function OpenSource() {
+function RepoAccordion({ repo, prs }: { repo: string; prs: PR[] }) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="flex">
-      {/* vertical line next to org row */}
       <div className="flex flex-col items-center" style={{ width: 20, marginRight: 10 }}>
         <div className="flex items-center" style={{ height: 24 }}>
           <div style={{ width: 10, height: 1, background: "rgba(255,255,255,0.1)" }} />
@@ -117,7 +134,6 @@ export default function OpenSource() {
       </div>
 
       <div className="flex-1">
-        {/* Org row — clickable */}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -134,7 +150,7 @@ export default function OpenSource() {
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
           </svg>
           <span className="text-[13px] text-white/55 group-hover:text-white/80 transition-colors">
-            PalisadoesFoundation / talawa-admin
+            PalisadoesFoundation / <span className="text-white/75">{repo}</span>
           </span>
           <span className="text-[10px] text-white/20 bg-white/[0.04] px-1.5 py-0.5 rounded-full ml-1">
             {prs.length} merged
@@ -158,7 +174,6 @@ export default function OpenSource() {
           </svg>
         </button>
 
-        {/* PR list */}
         <div
           style={{
             maxHeight: open ? `${prs.length * 52}px` : "0px",
@@ -171,7 +186,6 @@ export default function OpenSource() {
               const isLast = i === prs.length - 1;
               return (
                 <div key={pr.number} className="flex">
-                  {/* branch connector */}
                   <div
                     className="flex flex-col items-center"
                     style={{ width: 20, marginRight: 10 }}
@@ -226,6 +240,15 @@ export default function OpenSource() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function OpenSource() {
+  return (
+    <div className="flex flex-col gap-3">
+      <RepoAccordion repo="talawa-admin" prs={adminPRs} />
+      <RepoAccordion repo="talawa-api" prs={apiPRs} />
     </div>
   );
 }

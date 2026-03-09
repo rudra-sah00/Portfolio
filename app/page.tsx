@@ -1,3 +1,4 @@
+import Contact from "./components/Contact";
 import Hero from "./components/Hero";
 import Infrastructure from "./components/Infrastructure";
 import Projects from "./components/Projects";
@@ -12,6 +13,7 @@ export default function Home() {
         <Infrastructure />
         <Projects />
         <Work />
+        <Contact />
 
         {/* Footer */}
         <footer className="px-6 pt-12 pb-16 mt-8 border-t border-border">
