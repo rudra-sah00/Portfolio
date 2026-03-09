@@ -3,11 +3,11 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
+    "useIgnoreFile": true
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/*.css"]
+    "includes": ["**", "!**/*.css", "!!.next", "!!out", "!!dist"]
   },
   "formatter": {
     "enabled": true,
@@ -32,7 +32,7 @@
     "enabled": true,
     "actions": {
       "source": {
-        "organizeImports": { "level": "on" }
+        "organizeImports": "on"
       }
     }
   },
