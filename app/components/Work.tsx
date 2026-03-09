@@ -2,7 +2,7 @@ import OpenSource from "./works/OpenSource";
 
 export default function Work() {
   return (
-    <section className="pb-24 px-6">
+    <section id="work" className="pb-16 px-5 sm:pb-24 sm:px-6">
       <div className="mb-6">
         <span className="section-label">Work</span>
       </div>

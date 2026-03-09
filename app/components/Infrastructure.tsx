@@ -29,7 +29,7 @@ const services = [
 
 export default function Infrastructure() {
   return (
-    <section className="pb-16 px-6">
+    <section id="infrastructure" className="pb-12 px-5 sm:pb-16 sm:px-6">
       <div className="mb-8">
         <span className="section-label">Infrastructure</span>
         <p className="mt-3 text-sm text-muted-foreground max-w-md">
@@ -42,7 +42,7 @@ export default function Infrastructure() {
           <Link
             key={service.name}
             href={service.href}
-            className="group flex flex-col p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-300 no-underline"
+            className="group flex flex-col p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-300 no-underline sm:p-6"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 rounded-xl bg-white/[0.05] text-white/70 group-hover:text-purple-400 transition-colors">

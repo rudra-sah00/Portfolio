@@ -68,7 +68,7 @@ const cloudFeatures = [
 export default function CloudDetail() {
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-3xl px-6 py-16">
+      <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 no-underline group"
@@ -101,7 +101,7 @@ export default function CloudDetail() {
               Productivity Suite
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-white tracking-tight leading-tight">
+          <h1 className="text-3xl font-bold text-white tracking-tight leading-tight sm:text-4xl">
             Private Cloud Suite
             <br />
             <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -124,7 +124,7 @@ export default function CloudDetail() {
           </div>
         </header>
 
-        <div className="space-y-32">
+        <div className="space-y-16 sm:space-y-32">
           {cloudFeatures.map((feature) => (
             <section key={feature.title} className="animate-fade-in-up">
               <div className="mb-8">
@@ -150,7 +150,7 @@ export default function CloudDetail() {
           ))}
         </div>
 
-        <footer className="py-24 border-t border-border mt-32 text-center">
+        <footer className="py-12 border-t border-border mt-16 text-center sm:py-24 sm:mt-32">
           <p className="text-sm text-muted-foreground mb-4">Digital sovereignty at its finest.</p>
           <Link
             href="/"

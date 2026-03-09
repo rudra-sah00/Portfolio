@@ -37,7 +37,7 @@ const projects: Project[] = [
 
 export default function Projects() {
   return (
-    <section className="pb-24 px-6">
+    <section id="projects" className="pb-16 px-5 sm:pb-24 sm:px-6">
       {/* Section Header */}
       <div className="mb-10">
         <span className="section-label">Projects</span>
@@ -66,9 +66,9 @@ function ProjectCard({ project }: { project: Project }) {
       `}
     >
       {/* Content area */}
-      <div className="relative z-10 p-8 pb-0">
+      <div className="relative z-10 p-5 pb-0 sm:p-8 sm:pb-0">
         {/* Tags */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           {project.tags.map((tag) => (
             <span
               key={tag}
@@ -80,13 +80,15 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
 
         {/* Title & Subtitle */}
-        <h3 className="text-2xl font-semibold text-white tracking-tight">{project.title}</h3>
+        <h3 className="text-xl font-semibold text-white tracking-tight sm:text-2xl">
+          {project.title}
+        </h3>
         <p className="text-sm text-white/50 mt-1 font-medium">{project.subtitle}</p>
         <p className="text-sm text-white/40 mt-3 max-w-sm leading-relaxed">{project.description}</p>
       </div>
 
       {/* Hero Image */}
-      <div className="relative mt-8 mx-6 mb-0 overflow-hidden rounded-t-xl">
+      <div className="relative mt-6 mx-3 mb-0 overflow-hidden rounded-t-xl sm:mt-8 sm:mx-6">
         <div className="aspect-[16/9] relative">
           <Image
             src={project.image}

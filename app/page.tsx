@@ -1,3 +1,4 @@
+import BottomNav from "./components/BottomNav";
 import Contact from "./components/Contact";
 import Hero from "./components/Hero";
 import Infrastructure from "./components/Infrastructure";
@@ -8,7 +9,8 @@ import Work from "./components/Work";
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-2xl">
+      <BottomNav />
+      <main className="mx-auto w-full max-w-2xl pb-24">
         <Hero />
         <Infrastructure />
         <Projects />
@@ -16,7 +18,7 @@ export default function Home() {
         <Contact />
 
         {/* Footer */}
-        <footer className="px-6 pt-12 pb-16 mt-8 border-t border-border">
+        <footer className="px-5 pt-10 pb-14 mt-8 border-t border-border sm:px-6 sm:pt-12 sm:pb-16">
           {/* Contact rows */}
           <div className="flex flex-col divide-y divide-border">
             {[
@@ -122,7 +124,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-white/35 group-hover:text-white/60 transition-colors">
+                  <span className="text-[13px] text-white/35 group-hover:text-white/60 transition-colors truncate max-w-[140px] sm:max-w-none">
                     {handle}
                   </span>
                   <svg

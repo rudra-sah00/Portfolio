@@ -77,7 +77,7 @@ const features = [
 export default function StreamingProject() {
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-3xl px-6">
+      <main className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         {/* Navigation */}
         <nav className="pt-8 pb-4 sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
           <Link
@@ -122,7 +122,7 @@ export default function StreamingProject() {
 
         {/* Hero */}
         <header className="pt-4 pb-8 animate-fade-in">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex flex-wrap items-center gap-2 mb-5">
             {["UI/UX", "Full-Stack", "Streaming"].map((tag) => (
               <span
                 key={tag}
@@ -162,7 +162,7 @@ export default function StreamingProject() {
         </div>
 
         {/* Features */}
-        <div className="space-y-32 pb-32">
+        <div className="space-y-20 pb-20 sm:space-y-32 sm:pb-32">
           {features.map((feature) => (
             <FeatureSection key={feature.index} feature={feature} />
           ))}

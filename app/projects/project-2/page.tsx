@@ -205,7 +205,7 @@ const sections = [
 export default function CosmicWatchProject() {
   return (
     <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-3xl px-6">
+      <main className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         {/* Navigation */}
         <nav className="pt-8 pb-4 sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
           <Link
@@ -234,7 +234,7 @@ export default function CosmicWatchProject() {
 
         {/* Hero */}
         <header className="pt-12 pb-8 animate-fade-in">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex flex-wrap items-center gap-2 mb-5">
             {["Full-Stack", "Python", "NASA API", "WebSocket"].map((tag) => (
               <span
                 key={tag}
@@ -297,7 +297,7 @@ export default function CosmicWatchProject() {
         </header>
 
         {/* Hero Image */}
-        <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.06] mb-32 animate-fade-in-up">
+        <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.06] mb-16 animate-fade-in-up sm:mb-32">
           <div className="aspect-[16/9] relative bg-gradient-to-br from-blue-950 via-indigo-950 to-slate-950">
             <Image
               src={COSMIC_WATCH.hero}
@@ -311,7 +311,7 @@ export default function CosmicWatchProject() {
         </div>
 
         {/* Feature Sections */}
-        <div className="space-y-40">
+        <div className="space-y-24 sm:space-y-40">
           {sections.map((section) => (
             <section key={section.index} className="animate-fade-in-up">
               {/* Section Header */}
@@ -353,7 +353,7 @@ export default function CosmicWatchProject() {
         </div>
 
         {/* Tech Stack */}
-        <section className="mt-40 mb-32">
+        <section className="mt-20 mb-16 sm:mt-40 sm:mb-32">
           <h2 className="text-xl font-bold text-white mb-8">Under the Hood</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[

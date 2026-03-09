@@ -3,7 +3,7 @@ import { AVATAR_URL } from "@/lib/assets";
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-16 px-6">
+    <section id="hero" className="pt-20 pb-12 px-5 sm:pt-32 sm:pb-16 sm:px-6">
       {/* Avatar with status dot */}
       <div className="relative mb-5 w-fit">
         <div className="w-16 h-16 rounded-xl overflow-hidden ring-1 ring-white/10">
@@ -31,7 +31,7 @@ export default function Hero() {
 
       {/* CTA Buttons */}
       <div className="flex items-center gap-3 mt-6">
-        <a href="mailto:rudranarayanaknr@gmail.com" className="btn btn-outline">
+        <a href="#contact" className="btn btn-outline">
           Get in Touch
         </a>
         <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="btn btn-outline">

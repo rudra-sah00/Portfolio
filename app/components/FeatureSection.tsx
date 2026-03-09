@@ -47,7 +47,7 @@ export default function FeatureSection({ feature }: { feature: Feature }) {
         <span className={`text-sm font-mono font-medium ${feature.accent} opacity-70`}>
           {feature.index}
         </span>
-        <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mt-2 leading-tight">
+        <h2 className="text-2xl font-bold text-white tracking-tight mt-2 leading-tight sm:text-3xl sm:font-bold md:text-4xl">
           {feature.title}
         </h2>
         <p className={`text-lg font-medium mt-2 ${feature.accent}`}>{feature.subtitle}</p>

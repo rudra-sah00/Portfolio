@@ -14,7 +14,6 @@ export default function Contact() {
       const cal = await getCalApi({ namespace: "meeting" });
       cal("ui", {
         hideEventTypeDetails: false,
-        layout: "month_view",
         theme: "dark",
       });
     })();
@@ -42,7 +41,7 @@ export default function Contact() {
   }
 
   return (
-    <section className="px-6 pt-20 pb-8">
+    <section id="contact" className="px-5 pt-14 pb-8 sm:px-6 sm:pt-20">
       {/* Label */}
       <span className="text-[11px] font-medium tracking-[0.2em] uppercase text-white/20 mb-4 block">
         Contact
@@ -205,8 +204,8 @@ export default function Contact() {
             type="button"
             data-cal-namespace="meeting"
             data-cal-link="rudrasahoo/meeting"
-            data-cal-config='{"layout":"month_view","theme":"dark"}'
-            className="group w-full flex flex-col items-center justify-center gap-5 px-8 py-12 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all"
+            data-cal-config='{"theme":"dark"}'
+            className="group w-full flex flex-col items-center justify-center gap-4 px-6 py-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all sm:gap-5 sm:px-8 sm:py-12"
           >
             <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/[0.07] flex items-center justify-center">
               <svg
