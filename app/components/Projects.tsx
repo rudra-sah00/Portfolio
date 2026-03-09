@@ -21,7 +21,7 @@ const projects: Project[] = [
     tags: ["UI/UX", "Full-Stack", "Streaming"],
     gradient: "from-purple-950 via-purple-900 to-indigo-950",
     image: STREAMING.hero,
-    href: "/work/project-1",
+    href: "/projects/project-1",
   },
   {
     title: "Project 2",
@@ -31,7 +31,7 @@ const projects: Project[] = [
     tags: ["UI/UX", "Python", "Space"],
     gradient: "from-blue-950 via-indigo-950 to-slate-950",
     image: COSMIC_WATCH.hero,
-    href: "/work/project-2",
+    href: "/projects/project-2",
   },
 ];
 
@@ -40,10 +40,7 @@ export default function Projects() {
     <section className="pb-24 px-6">
       {/* Section Header */}
       <div className="mb-10">
-        <span className="section-label">Work</span>
-        <p className="mt-3 text-[15px] text-muted-foreground max-w-md leading-relaxed">
-          Below are some selected projects (as short-stories), full walk-throughs on calls.
-        </p>
+        <span className="section-label">Projects</span>
       </div>
 
       {/* Project Cards */}
