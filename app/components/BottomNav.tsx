@@ -88,6 +88,26 @@ const navItems = [
     ),
   },
   {
+    id: "certifications",
+    label: "Certifications",
+    icon: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="8" r="7" />
+        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+      </svg>
+    ),
+  },
+  {
     id: "contact",
     label: "Contact",
     icon: (
@@ -114,6 +134,8 @@ export default function BottomNav() {
   // null = hidden (initial), true = visible, false = hidden (scrolled away)
   const [visible, setVisible] = useState(false);
   const ticking = useRef(false);
+  const isClicking = useRef(false);
+  const clickTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Fade in after mount
@@ -142,16 +164,31 @@ export default function BottomNav() {
 
     // Active section: use getBoundingClientRect for true absolute document offsets
     function updateActive() {
+      if (isClicking.current) return;
+
       const ids = navItems.map((n) => n.id);
-      const mid = window.scrollY + window.innerHeight * 0.4;
+
+      // Look for the section that occupies the top-center of the viewport
+      const checkpoint = window.innerHeight * 0.25;
+
       let current = ids[0];
+
       for (const id of ids) {
         const el = document.getElementById(id);
         if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY;
-          if (top <= mid) current = id;
+          const rect = el.getBoundingClientRect();
+          // if the top of the element is above the checkpoint and the bottom is below it
+          if (rect.top <= checkpoint && rect.bottom > checkpoint) {
+            current = id;
+          }
         }
       }
+
+      // Auto-fallback: If we're at the very bottom of the page, make the last item active
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
+        current = ids[ids.length - 1];
+      }
+
       setActive(current);
     }
 
@@ -164,12 +201,20 @@ export default function BottomNav() {
 
     return () => {
       clearTimeout(t);
+      if (clickTimeout.current) clearTimeout(clickTimeout.current);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("scroll", onScrollActive);
     };
   }, []);
 
   function handleClick(id: string) {
+    setActive(id);
+    isClicking.current = true;
+    if (clickTimeout.current) clearTimeout(clickTimeout.current);
+    clickTimeout.current = setTimeout(() => {
+      isClicking.current = false;
+    }, 1000);
+
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -178,8 +223,10 @@ export default function BottomNav() {
       aria-label="Page navigation"
       className={`
         fixed bottom-6 left-1/2 z-50 -translate-x-1/2
-        flex items-center gap-0.5
-        px-2.5 py-2.5
+        flex items-center gap-0.5 sm:gap-1
+        px-2 py-2 sm:px-2.5 sm:py-2.5
+        max-w-[calc(100vw-2rem)]
+        overflow-x-auto scrollbar-hide
         rounded-full
         bg-[#111111]/85 backdrop-blur-2xl
         border border-white/[0.08]
@@ -195,7 +242,7 @@ export default function BottomNav() {
           onClick={() => handleClick(item.id)}
           aria-label={item.label}
           className={`
-            relative flex items-center justify-center w-10 h-10 rounded-full
+            relative flex items-center justify-center shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full
             transition-all duration-200 ease-out
             ${
               active === item.id
