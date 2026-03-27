@@ -11,14 +11,14 @@ const CDN_VIDEO = "https://res.cloudinary.com/dceixc4qg/video/upload";
 export const AVATAR_URL = `${CDN_BASE}/v1773041752/avatar_nilljf.png`;
 // ─── Streaming Project ──────────────────────────────────
 export const STREAMING = {
-  hero: `${CDN_BASE}/v1773039329/project-hero_xw23p2.png`,
-  continueWatching: `${CDN_BASE}/v1773039327/project-content_t2nssm.png`,
-  livestream: `${CDN_BASE}/v1773039327/project-content1_khxf9j.png`,
-  watchlist: `${CDN_BASE}/v1773039328/project-content2_gpxhzj.png`,
-  profile: `${CDN_BASE}/v1773039327/project-content3_suh68q.png`,
-  servers: `${CDN_BASE}/v1773039327/project-content4_cfzrqr.png`,
-  watchParty: `${CDN_BASE}/v1773039328/project-content5_pmnwi5.png`,
-  watchPartyVideo: `${CDN_VIDEO}/v1773045845/watch-party_djeclu.mp4`,
+  hero: `${CDN_BASE}/v1774614917/hero_dwv374.png`,
+  continueWatching: `${CDN_BASE}/v1774615094/continue-watching_wtukfw.png`,
+  livestream: `${CDN_BASE}/v1774615046/live_yihgu3.png`,
+  watchlist: `${CDN_BASE}/v1774615413/watchlist_cfgmkx_2bf303.png`,
+  profile: `${CDN_BASE}/v1774615572/profile_hoj8t2.png`,
+  servers: `${CDN_BASE}/v1774615572/profile_hoj8t2.png`,
+  watchParty: `${CDN_BASE}/v1774615781/watchparty_v56djz.png`,
+  watchPartyVideo: `${CDN_VIDEO}/v1774617219/watchparty_kocu4p.mp4`,
 } as const;
 
 // ─── Infrastructure (Private Cloud Suite) ───────────────
