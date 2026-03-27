@@ -60,7 +60,7 @@ const features = [
     subtitle: "Together, Anywhere.",
     description:
       "Watch with unlimited friends in a single room — fully synced playback with host controls. But it doesn't stop there: a built-in sketchboard, soundboard, live chat, and video/audio calling make every session feel like you're in the same room.",
-    video: "https://res.cloudinary.com/dceixc4qg/video/upload/v1773045845/watch-party_djeclu.mp4",
+    video: STREAMING.watchPartyVideo,
     gradient: "from-purple-500/20 to-transparent",
     accent: "text-purple-400",
     tags: [
