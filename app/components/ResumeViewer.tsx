@@ -15,7 +15,8 @@ interface ResumeViewerProps {
 export default function ResumeViewer({ url }: ResumeViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  const [numPages, setNumPages] = useState<number | null>(null);
+  const [_numPages, setNumPages] = useState<number | null>(null);
+  const [pages, setPages] = useState<{ id: string; number: number }[]>([]);
 
   useEffect(() => {
     const updateWidth = () => {
@@ -31,6 +32,12 @@ export default function ResumeViewer({ url }: ResumeViewerProps) {
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
+    setPages(
+      Array.from({ length: numPages }, (_, i) => ({
+        id: `resume-page-${i + 1}`,
+        number: i + 1,
+      }))
+    );
   }
 
   return (
@@ -50,14 +57,13 @@ export default function ResumeViewer({ url }: ResumeViewerProps) {
         }
       >
         {containerWidth &&
-          Array.from(new Array(numPages), (_, index) => (
+          pages.map((page) => (
             <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: Page order is static for a fixed PDF
-              key={`resume-p-${index + 1}`}
+              key={page.id}
               className="shadow-2xl shadow-black/50 border border-white/[0.05] rounded-sm overflow-hidden bg-white"
             >
               <Page
-                pageNumber={index + 1}
+                pageNumber={page.number}
                 width={Math.min(containerWidth - 32, 800)} // Subtracting padding and capping at 800px for desktop
                 renderAnnotationLayer={true}
                 renderTextLayer={true}
