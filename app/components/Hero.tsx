@@ -1,7 +1,13 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { AVATAR_URL } from "@/lib/assets";
+import ResumeModal from "./ResumeModal";
 
 export default function Hero() {
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+
   return (
     <section id="hero" className="pt-20 pb-12 px-5 sm:pt-32 sm:pb-16 sm:px-6">
       {/* Avatar with status dot */}
@@ -34,10 +40,13 @@ export default function Hero() {
         <a href="#contact" className="btn btn-outline">
           Get in Touch
         </a>
-        <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+        <button onClick={() => setIsResumeOpen(true)} className="btn btn-outline" type="button">
           Resume
-        </a>
+        </button>
       </div>
+
+      {/* Resume Modal */}
+      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} />
 
       {/* Social links */}
       <div className="flex items-center gap-4 mt-5">
