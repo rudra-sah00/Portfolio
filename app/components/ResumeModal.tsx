@@ -29,27 +29,39 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   useEffect(() => {
     if (!isOpen) return;
 
+    // Save the current scroll position
+    const scrollY = window.scrollY;
+    const body = document.body;
+
     // Detect if we have a scrollbar that takes up space (typically desktop)
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-    // Store original body styles to restore them exactly
-    const originalStyle = {
-      overflow: document.body.style.overflow,
-      paddingRight: document.body.style.paddingRight,
-    };
+    // Apply fixed positioning to lock the background
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
 
-    // Apply the lock to the body
-    document.body.style.overflow = "hidden";
-
-    // Only apply padding compensation if scrollbar width exists (desktop)
+    // Apply padding compensation if scrollbar width exists to prevent layout jump
     if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      body.style.paddingRight = `${scrollbarWidth}px`;
     }
 
     return () => {
-      // Restore original body styles exactly as they were
-      document.body.style.overflow = originalStyle.overflow;
-      document.body.style.paddingRight = originalStyle.paddingRight;
+      // Get the stored scroll position from the top value
+      const scrollYString = body.style.top;
+
+      // Clean up body styles
+      body.style.position = "";
+      body.style.top = "";
+      body.style.width = "";
+      body.style.overflow = "";
+      body.style.paddingRight = "";
+
+      // Restore the scroll position
+      if (scrollYString) {
+        window.scrollTo(0, Math.abs(parseInt(scrollYString, 10)) || 0);
+      }
     };
   }, [isOpen]);
 
