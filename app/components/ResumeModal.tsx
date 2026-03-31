@@ -27,13 +27,29 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+    if (!isOpen) return;
+
+    // Detect if we have a scrollbar that takes up space (typically desktop)
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    // Store original body styles to restore them exactly
+    const originalStyle = {
+      overflow: document.body.style.overflow,
+      paddingRight: document.body.style.paddingRight,
+    };
+
+    // Apply the lock to the body
+    document.body.style.overflow = "hidden";
+
+    // Only apply padding compensation if scrollbar width exists (desktop)
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
+
     return () => {
-      document.body.style.overflow = "unset";
+      // Restore original body styles exactly as they were
+      document.body.style.overflow = originalStyle.overflow;
+      document.body.style.paddingRight = originalStyle.paddingRight;
     };
   }, [isOpen]);
 
