@@ -1,6 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+
+// Dynamically import the PDF viewer with SSR disabled to avoid canvas issues during hydration
+const ResumeViewer = dynamic(() => import("./ResumeViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col items-center justify-center h-[50vh] pt-20">
+      <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+      <p className="text-xs text-white/40">Preparing resume...</p>
+    </div>
+  ),
+});
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -38,7 +50,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
       />
 
       {/* Modal Container */}
-      <div className="relative w-full h-full md:h-[88vh] md:max-w-3xl bg-[#0f0f0f] border-x-0 border-y-0 md:border md:border-white/[0.08] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-fade-in-up md:aspect-[1/1.3]">
+      <div className="relative w-full h-full md:h-[88vh] md:max-w-3xl bg-[#0f0f0f] border-x-0 border-y-0 md:border md:border-white/[0.08] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-fade-in-up">
         {/* Header */}
         <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/[0.08] bg-white/[0.02]">
           <div className="flex items-center gap-3">
@@ -75,7 +87,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
           <div className="flex items-center gap-2">
             <a
               href="/resume.pdf"
-              download="Rudra_Sahoo_Resume.pdf"
+              download="rudra_sahoo_resume.pdf"
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-white/90 transition-colors"
             >
               <svg
@@ -123,13 +135,9 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
           </div>
         </div>
 
-        {/* PDF Content */}
-        <div className="flex-1 w-full bg-black/20 h-full">
-          <iframe
-            src="/resume.pdf#view=FitH&toolbar=0"
-            className="w-full h-full border-none"
-            title="Resume PDF"
-          />
+        {/* PDF Content Area */}
+        <div className="flex-1 w-full bg-black/40 overflow-hidden">
+          <ResumeViewer url="/resume.pdf" />
         </div>
 
         {/* Footer for mobile/accessibility fallback */}
