@@ -74,3 +74,8 @@ export const MYCHESS = {
   playerPage: `${CDN_BASE}/v1773076387/project-content3_md7cld.png`,
   matchHistory: `${CDN_BASE}/v1773076387/project-content4_ztqn9b.png`,
 } as const;
+
+// ─── SSH Client ──────────────────────────────────────────
+export const SSH_CLIENT = {
+  hero: "https://res.cloudinary.com/dceixc4qg/image/upload/v1776791669/hero_njouwf.png",
+} as const;

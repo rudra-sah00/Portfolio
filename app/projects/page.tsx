@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { COSMIC_WATCH, MYCHESS, STREAMING, TRADING_CHART } from "@/lib/assets";
+import { COSMIC_WATCH, MYCHESS, SSH_CLIENT, STREAMING, TRADING_CHART } from "@/lib/assets";
 
 interface Project {
   number: string;
@@ -66,6 +66,19 @@ const projects: Project[] = [
     image: MYCHESS.hero,
     href: "/projects/project-4",
     year: "2025",
+    status: "live",
+  },
+  {
+    number: "05",
+    title: "SSH",
+    subtitle: "Mobile SSH Client · Terminal · SFTP · Tunneling",
+    description:
+      "A production-ready mobile SSH client built with Flutter. Multi-session terminal with auto-reconnect, SFTP file browser, SSH tunneling, secure credential storage, and a clean iOS-style interface. Pure client-side — no backend required.",
+    tags: ["Flutter", "Mobile", "SSH"],
+    gradient: "from-neutral-950 via-zinc-900 to-stone-950",
+    image: SSH_CLIENT.hero,
+    href: "/projects/project-5",
+    year: "2026",
     status: "live",
   },
 ];
