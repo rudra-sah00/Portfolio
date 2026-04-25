@@ -3,6 +3,75 @@ import Link from "next/link";
 import FeatureSection from "@/app/components/FeatureSection";
 import { STREAMING } from "@/lib/assets";
 
+const latestReleaseUrl = "https://github.com/rudra-sah00/nightwatch/releases/latest";
+
+type ReleaseAsset = {
+  name: string;
+  browser_download_url: string;
+};
+
+type ReleaseResponse = {
+  html_url: string;
+  assets: ReleaseAsset[];
+};
+
+type DownloadLinkSet = {
+  release: string;
+  macos: string;
+  windows: string;
+  linux: string;
+  hasWindowsAsset: boolean;
+};
+
+async function getLatestDownloads(): Promise<DownloadLinkSet> {
+  try {
+    const response = await fetch(
+      "https://api.github.com/repos/rudra-sah00/nightwatch/releases/latest",
+      { next: { revalidate: 1800 } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned ${response.status}`);
+    }
+
+    const release = (await response.json()) as ReleaseResponse;
+
+    const findAsset = (predicate: (asset: ReleaseAsset) => boolean) =>
+      release.assets.find(predicate)?.browser_download_url;
+
+    const macos =
+      findAsset((asset) => asset.name.endsWith(".dmg") && !asset.name.endsWith(".blockmap")) ??
+      findAsset((asset) => asset.name.includes("mac") && asset.name.endsWith(".zip")) ??
+      release.html_url;
+
+    const windows =
+      findAsset((asset) => asset.name.endsWith(".exe")) ??
+      findAsset((asset) => asset.name.endsWith(".msi")) ??
+      release.html_url;
+
+    const linux =
+      findAsset((asset) => asset.name.endsWith(".AppImage")) ??
+      findAsset((asset) => asset.name.endsWith(".deb")) ??
+      release.html_url;
+
+    return {
+      release: release.html_url,
+      macos,
+      windows,
+      linux,
+      hasWindowsAsset: windows !== release.html_url,
+    };
+  } catch {
+    return {
+      release: latestReleaseUrl,
+      macos: latestReleaseUrl,
+      windows: latestReleaseUrl,
+      linux: latestReleaseUrl,
+      hasWindowsAsset: false,
+    };
+  }
+}
+
 const features = [
   {
     index: "01",
@@ -74,7 +143,14 @@ const features = [
   },
 ];
 
-export default function StreamingProject() {
+export default async function StreamingProject() {
+  const downloads = await getLatestDownloads();
+  const downloadOptions = [
+    { label: "macOS", href: downloads.macos },
+    { label: "Windows", href: downloads.windows },
+    { label: "Linux", href: downloads.linux },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto w-full max-w-3xl px-4 sm:px-6">
@@ -110,12 +186,12 @@ export default function StreamingProject() {
           &amp; development project built for portfolio purposes only. I do not host, distribute, or
           stream any copyrighted content. This project is not intended for public use. Hosted at{" "}
           <a
-            href="https://watch.rudrasahoo.live"
+            href="https://nightwatch.in"
             target="_blank"
             rel="noopener noreferrer"
             className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors"
           >
-            watch.rudrasahoo.live
+            nightwatch.in
           </a>
           .
         </div>
@@ -145,6 +221,37 @@ export default function StreamingProject() {
             Netflix · Hotstar · HBO · Disney+ — reimagined with watch parties, smart features, and a
             focus on what truly matters: the experience.
           </p>
+
+          <div className="mt-6 space-y-3">
+            <p className="text-sm text-white/60">Download the desktop app</p>
+            <div className="flex flex-wrap gap-3">
+              {downloadOptions.map((option) => (
+                <a
+                  key={option.label}
+                  href={option.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-lg border border-white/15 bg-white/[0.03] px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-white/[0.08]"
+                >
+                  {option.label}
+                </a>
+              ))}
+
+              <a
+                href={downloads.release}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-lg border border-purple-400/35 bg-purple-500/10 px-4 py-2 text-sm font-medium text-purple-200 no-underline transition-colors hover:bg-purple-500/20"
+              >
+                Latest on GitHub
+              </a>
+            </div>
+            <p className="text-xs text-white/45">
+              {downloads.hasWindowsAsset
+                ? "Downloads are always pulled from the latest GitHub release."
+                : "Windows builds are published on the latest GitHub release page."}
+            </p>
+          </div>
         </header>
 
         {/* Hero Image */}
