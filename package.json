@@ -39,5 +39,8 @@
     "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["canvas", "sharp", "simple-git-hooks", "unrs-resolver"]
   }
 }
