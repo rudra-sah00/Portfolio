@@ -44,3 +44,4 @@
     "onlyBuiltDependencies": ["canvas", "sharp", "simple-git-hooks", "unrs-resolver"]
   }
 }
+
